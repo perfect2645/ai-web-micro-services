@@ -42,5 +42,5 @@ src/
 
 
 ### Card 组件
-
+yarn global add shadcn-ui
 npx shadcn@latest add https://21st.dev/r/Codehagen/display-cards
