@@ -5,12 +5,26 @@ yarn create vite ui-user-app --template react-ts
 
 ## 基础依赖
 cd ui-user-app
-yarn add sass
 yarn add axios
+
+## 样式SCSS
+yarn add scss
+yarn add -D sass-embedded
+
+ - TS 会不认识.module.scss文件，需要在项目的src目录下新建一个类型声明文件declarations.d.ts
+```
+// src/declarations.d.ts
+declare module '*.module.scss' {
+  const classes: { [key: string]: string };
+  export default classes;
+}
+```
 ## tailwindcss
-yarn add tailwindcss @tailwindcss/vite
-yarn add -D tailwindcss postcss autoprefixer
-> 安装Tailwind依赖（postcss/autoprefixer是Tailwind的必要依赖）
+yarn add -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
+### 额外的依赖
+yarn add clsx tailwind-merge
+
 ## 图片上传（拖拽/点击）
 yarn add react-dropzone
 yarn add -D @types/react-dropzone

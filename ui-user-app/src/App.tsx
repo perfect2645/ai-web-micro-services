@@ -1,10 +1,10 @@
 import './App.css'
-import HomeBackground from './pages/home/HomeBackground'
+import HomePage from './pages/home/home-page'
 
 function App() {
   return (
     <>
-      <HomeBackground />
+      <HomePage />
     </>
   )
 }
