@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
-import "./PromptInput.css";
+import UploadButton from "@/components/ui/prompt/upload-button";
+import classes from "./prompt-input.module.scss";
 
 // 图片信息类型定义
 export interface PromptImage {
@@ -41,7 +42,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
   imageList,
   onChange,
   onSubmit,
-  placeholder = "请输入提示词或上传图片...",
+  placeholder = "prompt text or image ...",
   className,
   disabled = false,
   acceptImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"],
@@ -260,9 +261,9 @@ const PromptInput: React.FC<PromptInputProps> = ({
 
   return (
     <div
-      className={`prompt-container ${className || ""} ${
-        isDragOver ? "prompt-container--drag-over" : ""
-      } ${disabled ? "prompt-container--disabled" : ""}`}
+      className={`${classes.promptContainer} ${className || ""} ${
+        isDragOver ? classes.promptContainerDragOver : ""
+      } ${disabled ? classes.promptContainerDisabled : ""}`}
       onDragEnter={handleDragEnter}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -270,23 +271,23 @@ const PromptInput: React.FC<PromptInputProps> = ({
     >
       {/* 图片预览列表 */}
       {imageList.length > 0 && (
-        <div className="prompt-image-list">
+        <div className={classes.promptImageList}>
           {imageList.map((image) => (
-            <div key={image.id} className="prompt-image-card">
+            <div key={image.id} className={classes.promptImageCard}>
               <img
                 src={image.url}
                 alt={image.name}
-                className="prompt-image-preview"
+                className={classes.promptImagePreview}
               />
               <div
-                className="prompt-image-remove"
+                className={classes.promptImageRemove}
                 onClick={() => handleRemoveImage(image.id)}
               >
                 ✕
               </div>
-              <div className="prompt-image-info">
-                <span className="prompt-image-name">{image.name}</span>
-                <span className="prompt-image-size">
+              <div className={classes.promptImageInfo}>
+                <span className={classes.promptImageName}>{image.name}</span>
+                <span className={classes.promptImageSize}>
                   {(image.size / 1024 / 1024).toFixed(2)}MB
                 </span>
               </div>
@@ -297,7 +298,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
 
       {/* 文字输入框 */}
       <textarea
-        className="prompt-textarea"
+        className={classes.promptTextarea}
         value={textValue}
         onChange={handleTextChange}
         onPaste={handlePaste}
@@ -309,21 +310,14 @@ const PromptInput: React.FC<PromptInputProps> = ({
       />
 
       {/* 操作栏 */}
-      <div className="prompt-action-bar">
-        {/* 选择图片按钮 */}
-        <button
-          type="button"
-          className="prompt-btn prompt-btn--image"
-          onClick={handleSelectImageClick}
-          disabled={disabled}
-        >
-          🖼️ 上传图片
-        </button>
+      <div className={classes.promptActionBar}>
+        {/* 使用新创建的 UploadButton 组件 */}
+        <UploadButton onClick={handleSelectImageClick} disabled={disabled} />
 
         {/* 提交按钮 */}
         <button
           type="button"
-          className="prompt-btn prompt-btn--submit"
+          className={`${classes.promptBtn} ${classes.promptBtnSubmit}`}
           onClick={handleSubmitClick}
           disabled={disabled || (!textValue.trim() && imageList.length === 0)}
         >

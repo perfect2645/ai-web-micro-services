@@ -1,7 +1,14 @@
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import classes from "./home-page.module.scss";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate("/prompt");
+  };
+
   return (
     <div className={classes.container}>
       {/* Background flickering grid */}
@@ -28,7 +35,10 @@ const HomePage = () => {
             </span>
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-teal-500 hover:bg-indigo-700 text-purple font-semibold py-3 px-6 rounded-lg transition duration-300">
+            <button
+              className="bg-teal-500 hover:bg-indigo-700 text-purple font-semibold py-3 px-6 rounded-lg transition duration-300"
+              onClick={handleGetStarted}
+            >
               Get Started
             </button>
             <button className="bg-indigo-600 hover:bg-indigo-700 text-purple font-semibold py-3 px-6 rounded-lg transition duration-300">
