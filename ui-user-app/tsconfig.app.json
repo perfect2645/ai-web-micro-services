@@ -24,5 +24,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"], // 确保覆盖src目录，必不可少
+  "include": ["src"] // 确保覆盖src目录，必不可少
 }
