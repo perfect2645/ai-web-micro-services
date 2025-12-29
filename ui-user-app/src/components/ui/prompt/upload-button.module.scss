@@ -1,0 +1,29 @@
+.button {
+  --bg: linear-gradient(180deg, hsla(0, 0%, 100%, 0.1), hsla(0, 0%, 100%, 0)),
+    hsl(128, 52%, 45%);
+  box-shadow: 0 1px 2px #25114f66, 0 0 0 1px hsla(128, 50%, 45%, 0.761);
+  background-color: transparent;
+  border: none;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  padding-right: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--bg);
+  white-space: nowrap;
+  border-radius: 6px;
+  border: 1px solid #fff3;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}

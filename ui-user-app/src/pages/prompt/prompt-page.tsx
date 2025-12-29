@@ -34,14 +34,14 @@ const PromptPage: React.FC = () => {
   return (
     <div style={{ padding: 20 }}>
       <h2 style={{ color: "#1f2937", marginBottom: 20, textAlign: "center" }}>
-        仿豆包 Prompt 输入框
+        Prompt with text and image
       </h2>
       <PromptInput
         textValue={textValue}
         imageList={imageList}
         onChange={handlePromptChange}
         onSubmit={handlePromptSubmit}
-        placeholder="请输入你的问题，或上传图片获取帮助..."
+        placeholder="Please enter your question, or upload an image for assistance..."
       />
     </div>
   );

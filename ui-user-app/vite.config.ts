@@ -11,4 +11,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    allowedHosts: ["home.fawei.dpdns.org"], // 加入被拦截的主机
+  },
 });

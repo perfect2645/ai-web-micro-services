@@ -1,203 +1,129 @@
-/* 容器样式 */
-.prompt-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  background-color: #ffffff;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+.promptContainer {
+  /* Base container styles */
 }
 
-/* 拖拽悬浮状态 */
-.prompt-container--drag-over {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-  background-color: #f8fafc;
+.promptContainerDragOver {
+  /* Styles when dragging over */
 }
 
-/* 禁用状态 */
-.prompt-container--disabled {
-  background-color: #f9fafb;
-  cursor: not-allowed;
+.promptContainerDisabled {
+  /* Styles when disabled */
 }
 
-/* 图片预览列表 */
-.prompt-image-list {
+.promptImageList {
+  /* Image list container */
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
-  max-height: 200px;
-  overflow-y: auto;
-  padding-right: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-/* 图片卡片 */
-.prompt-image-card {
-  width: 120px;
-  height: 140px;
-  border: 1px solid #e5e7eb;
+.promptImageCard {
+  /* Individual image card */
+  position: relative;
+  width: 100px;
+  height: 100px;
   border-radius: 8px;
   overflow: hidden;
-  position: relative;
-  background-color: #f9fafb;
 }
 
-/* 图片预览 */
-.prompt-image-preview {
+.promptImagePreview {
+  /* Image preview */
   width: 100%;
-  height: 100px;
+  height: 100%;
   object-fit: cover;
-  border-bottom: 1px solid #e5e7eb;
 }
 
-/* 图片删除按钮 */
-.prompt-image-remove {
+.promptImageRemove {
+  /* Remove button */
   position: absolute;
   top: 4px;
   right: 4px;
   width: 20px;
   height: 20px;
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.prompt-image-remove:hover {
-  background-color: #ef4444;
-}
-
-/* 图片信息 */
-.prompt-image-info {
-  padding: 6px 8px;
+  color: white;
   font-size: 12px;
-  color: #4b5563;
 }
 
-.prompt-image-name {
+.promptImageInfo {
+  /* Image info container */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  color: white;
+  font-size: 10px;
+}
+
+.promptImageName {
+  /* Image name */
   display: block;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 2px;
+  white-space: nowrap;
 }
 
-.prompt-image-size {
-  color: #9ca3af;
+.promptImageSize {
+  /* Image size */
+  display: block;
 }
 
-/* 文字输入框 */
-.prompt-textarea {
-  width: 100%;
-  padding: 16px 20px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 15px;
-  line-height: 1.6;
-  color: #1f2937;
+.promptTextarea {
+  /* Textarea styles */
+  width: 600px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   resize: vertical;
-  min-height: 120px;
-  max-height: 300px;
-  outline: none;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-  margin-bottom: 16px;
-}
-
-.prompt-textarea:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.prompt-textarea:disabled {
-  background-color: #f3f4f6;
-  color: #9ca3af;
-}
-
-.prompt-textarea::placeholder {
-  color: #9ca3af;
+  font-family: inherit;
   font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+
+  &:disabled {
+    background-color: #f5f5f5;
+  }
 }
 
-/* 操作栏 */
-.prompt-action-bar {
+.promptActionBar {
+  /* Action bar container */
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 12px;
 }
 
-/* 通用按钮样式 */
-.prompt-btn {
+.promptBtn {
+  /* Base button styles */
   padding: 8px 16px;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
+  font-weight: 500;
 
-/* 上传图片按钮 */
-.prompt-btn--image {
-  background-color: #f3f4f6;
-  color: #4b5563;
-}
-
-.prompt-btn--image:hover:not(:disabled) {
-  background-color: #e5e7eb;
-  color: #1f2937;
-}
-
-/* 提交按钮 */
-.prompt-btn--submit {
-  background-color: #3b82f6;
-  color: #ffffff;
-}
-
-.prompt-btn--submit:hover:not(:disabled) {
-  background-color: #2563eb;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-}
-
-.prompt-btn--submit:disabled {
-  background-color: #93c5fd;
-  cursor: not-allowed;
-}
-
-/* 响应式适配 */
-@media (max-width: 768px) {
-  .prompt-container {
-    padding: 16px;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
+}
 
-  .prompt-textarea {
-    padding: 14px 16px;
-    font-size: 14px;
-    min-height: 100px;
-    margin-bottom: 12px;
-  }
+.promptBtnSubmit {
+  /* Submit button specific styles */
+  background-color: #007bff;
+  color: white;
 
-  .prompt-image-card {
-    width: 100px;
-    height: 120px;
-  }
-
-  .prompt-image-preview {
-    height: 80px;
-  }
-
-  .prompt-btn {
-    padding: 6px 12px;
-    font-size: 13px;
+  &:hover:not(:disabled) {
+    background-color: #0056b3;
   }
 }
