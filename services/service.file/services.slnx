@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/api.services/" />
+  <Folder Name="/api.services/file-service/">
+    <Project Path="service.file.csproj" />
+  </Folder>
+  <Folder Name="/shared/">
+    <Project Path="../../../../../CSharp/Laboratory/Logging/Logging.csproj" />
+    <Project Path="../../../../../CSharp/Laboratory/Utils/Utils.csproj" />
+  </Folder>
+</Solution>
