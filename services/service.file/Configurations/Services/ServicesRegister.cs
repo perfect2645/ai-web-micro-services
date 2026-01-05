@@ -1,4 +1,4 @@
-﻿using Utils.Aspnet.Configurations;
+﻿using NetUtils.Aspnet.Configurations;
 
 namespace service.file.Configurations.Services
 {

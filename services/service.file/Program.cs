@@ -1,7 +1,7 @@
 using Logging;
 using service.file.Configurations.Services;
-using Utils.Aspnet.Configurations;
-using Utils.Aspnet.Configurations.Swagger;
+using NetUtils.Aspnet.Configurations;
+using NetUtils.Aspnet.Configurations.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
