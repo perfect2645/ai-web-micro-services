@@ -1,4 +1,5 @@
 ﻿using NetUtils.Aspnet.Configurations;
+using service.file.Configurations.DomainSettings;
 
 namespace service.file.Configurations.Services
 {
@@ -12,6 +13,7 @@ namespace service.file.Configurations.Services
                 //typeof(IShirtRepository).Assembly
             });
             builder.RegisterMiddlewares();
+            builder.Configurations();
         }
 
         private static void RegisterMiddlewares(this WebApplicationBuilder builder)
@@ -20,6 +22,11 @@ namespace service.file.Configurations.Services
             builder.Services.AddOpenApi();
 
             //builder.Services.AddApiVersioning()
+        }
+
+        private static void Configurations(this WebApplicationBuilder builder)
+        {
+            builder.Services.Configure<Settings>(builder.Configuration.GetSection(Constants.Settings));
         }
     }
 }
