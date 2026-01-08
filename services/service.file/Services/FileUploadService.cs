@@ -28,8 +28,6 @@ namespace service.file.Services
                 return string.Empty;
             }
 
-
-
             //var uploadedItem = new UploadedItem(fileName, )
 
             //await _repository.AddAsync(uploadedItem, cancellationToken);

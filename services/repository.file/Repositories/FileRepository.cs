@@ -10,7 +10,7 @@ namespace repository.file.Repositories
         {
         }
 
-        public async ValueTask<UploadedItem?> FindFileAsync(string sha256Hash, long fileSize, CancellationToken ct = default)
+        public async ValueTask<UploadedItem?> FindFileAsync(long fileSize, string sha256Hash, CancellationToken ct = default)
         {
             return await GetAsync(item => item.FileHash == sha256Hash && item.FileSize == fileSize, true, ct);
         }

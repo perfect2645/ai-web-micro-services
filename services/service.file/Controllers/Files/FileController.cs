@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using repository.file.Repositories.Entities;
+using service.file.Filters.Files;
 using service.file.Services;
 using System.ComponentModel.DataAnnotations;
 using Utils.Json;
@@ -23,6 +24,7 @@ namespace service.file.Controllers.Files
         }
 
         [HttpGet]
+        [TypeFilter(typeof(FileKeyValidationFilterAttribute))]
         public async Task<ActionResult<ApiResponse<UploadedItem?>>> Get([FromQuery, Required] long fileSize,
             [FromQuery, Required] string sha256Hash)
         {
