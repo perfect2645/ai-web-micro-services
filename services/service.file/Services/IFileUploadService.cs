@@ -6,5 +6,6 @@ namespace service.file.Services
     {
         Task<UploadedItem?> GetUploadedItemAsync(long fileSize, string sha256Hash, CancellationToken cancellationToken = default);
         Task<string> UploadFileAsync(Stream fileStream, string fileName, string? description = null, CancellationToken cancellationToken = default);
+        Task<string> UploadFileAsync(IFormFile formFile, string? description = null, CancellationToken cancellationToken = default);
     }
 }

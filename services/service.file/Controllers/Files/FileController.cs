@@ -33,5 +33,14 @@ namespace service.file.Controllers.Files
 
             return Ok(result);
         }
+
+        [HttpPost]
+        public async Task<ActionResult<Uri>> Upload(
+            [FromForm] IFormFile file,
+            [FromForm] string? description = null)
+        {
+            var fileRemoteUrl = await _fileUploadService.UploadFileAsync(file, description);
+            return Ok(fileRemoteUrl);
+        }
     }
 }
