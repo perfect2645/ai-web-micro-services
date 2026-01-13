@@ -1,4 +1,4 @@
 ﻿namespace service.file.Configurations.DomainSettings
 {
-    public record FileStorageSettings(string StoragePath, string CloudPath, double MaxFileSizeMB);
+    public record FileStorageSettings(string RemotePath, string BackupPath, string CloudPath, double MaxFileSizeMB);
 }
