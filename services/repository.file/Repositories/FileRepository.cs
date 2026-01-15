@@ -1,0 +1,18 @@
+﻿using NetUtils.Repository;
+using repository.file.Repositories.Entities;
+
+namespace repository.file.Repositories
+{
+    public class FileRepository : RepositoryBase<UploadedItem, Guid>, IFileRepository
+    {
+
+        public FileRepository(FileDbContext fileDbContext) : base(fileDbContext)
+        {
+        }
+
+        public async ValueTask<UploadedItem?> FindFileAsync(long fileSize, string sha256Hash, CancellationToken ct = default)
+        {
+            return await GetAsync(item => item.FileHash == sha256Hash && item.FileSize == fileSize, true, ct);
+        }
+    }
+}
