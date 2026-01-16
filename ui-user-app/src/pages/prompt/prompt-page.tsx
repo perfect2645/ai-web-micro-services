@@ -1,6 +1,29 @@
 import React, { useState } from "react";
 import PromptInput, { PromptImage } from "@/components/prompt/prompt-input";
 
+const blessingList = [
+  "新年快乐！",
+  "马年吉祥！",
+  "暴富暴富！",
+  "好运连连！",
+  "万事顺意！",
+  "平安喜乐！",
+  "心想事成！",
+  "财运亨通！",
+  "福气满满！",
+  "喜事临门！",
+  "前程似锦！",
+  "笑口常开！",
+  "健康无忧！",
+  "吉祥如意！",
+  "好运爆棚！",
+  "升职加薪！",
+  "幸福美满！",
+  "诸事皆顺！",
+  "好运常在！",
+  "日日欢喜！",
+];
+
 const PromptPage: React.FC = () => {
   // 管理文字内容和图片列表
   const [textValue, setTextValue] = useState("");
@@ -28,7 +51,9 @@ const PromptPage: React.FC = () => {
     // 提交后清空内容（可选）
     setTextValue("");
     setImageList([]);
-    alert("提交成功！");
+    const randomBlessing =
+      blessingList[Math.floor(Math.random() * blessingList.length)];
+    alert(randomBlessing);
   };
 
   return (
