@@ -26,7 +26,7 @@ namespace service.file.Configurations.Services
 
         private static void Configurations(this WebApplicationBuilder builder)
         {
-            builder.Services.Configure<Settings>(builder.Configuration.GetSection(Constants.Settings));
+            builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(Constants.FileStorageSettings));
         }
     }
 }

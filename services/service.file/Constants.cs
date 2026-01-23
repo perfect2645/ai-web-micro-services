@@ -2,6 +2,6 @@
 {
     public class Constants
     {
-        public const string Settings = "Settings";
+        public const string FileStorageSettings = "FileStorageSettings";
     }
 }

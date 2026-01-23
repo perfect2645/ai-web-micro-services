@@ -1,6 +1,7 @@
 ﻿
 using Logging;
 using Microsoft.Extensions.Options;
+using NetUtils.Aspnet.Generic;
 using NetUtils.Repository;
 using repository.file.Repositories.Entities;
 using service.file.Configurations.DomainSettings;
@@ -13,11 +14,15 @@ namespace service.file.Services
 
         private readonly IRepository<UploadedItem, string> _repository;
         private readonly FileStorageSettings _fileStorageSettings;
+        private readonly HttpContextAccessor _httpContextAccessor;
 
-        public FileUploadService(IRepository<UploadedItem, string> repository, IOptions<FileStorageSettings> fileStorageSettings)
+        public FileUploadService(IRepository<UploadedItem, string> repository, 
+            IOptions<FileStorageSettings> fileStorageSettings,
+            HttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _fileStorageSettings = fileStorageSettings.Value;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<UploadedItem?> GetUploadedItemAsync(long fileSize, string sha256Hash, CancellationToken cancellationToken = default)
@@ -28,7 +33,9 @@ namespace service.file.Services
         public async Task<UploadedItem> UploadFileAsync(Stream fileDataStream, string fileName, string? description = null, CancellationToken cancellationToken = default)
         {
             // save file to disk D:\Web\image-ai\fileServiceStorage
-            string hash = HashHelper.ComputeSHA256Hash(fileDataStream);
+            var fileHashInCache = _httpContextAccessor.HttpContext?.GetString("fileHash");
+            var fileHash = fileHashInCache ?? HashHelper.ComputeSHA256Hash(fileDataStream);
+
             long fileSize = fileDataStream.Length;
             var today = DateTime.Today;
             string remotePath = Path.Combine(_fileStorageSettings.RemotePath, $"/{today:yyyy/MM/dd}/{fileName}");
@@ -36,7 +43,7 @@ namespace service.file.Services
 
             string backupPath = Path.Combine(_fileStorageSettings.BackupPath, $"/{today:yyyy/MM/dd}/{fileName}");
             var backupUri = await SaveFileToStorage(fileDataStream, remotePath, cancellationToken);
-            var uploadedItem = new UploadedItem(fileName, fileSize, hash, backupUri, remoteUri, description);
+            var uploadedItem = new UploadedItem(fileName, fileSize, fileHash, backupUri, remoteUri, description);
 
             await _repository.AddAsync(uploadedItem, cancellationToken);
             Log4Logger.Logger.Info($"File metadata saved to database. FileId: {uploadedItem.Id}");

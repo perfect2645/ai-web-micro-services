@@ -9,7 +9,7 @@ using Utils.Json;
 namespace service.file.Controllers.Files
 {
     [ApiController]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/[controller]")]
     [ApiVersion(1.0)]
     public class FileController : ControllerBase
     {
@@ -35,9 +35,9 @@ namespace service.file.Controllers.Files
         }
 
         [HttpPost]
-
+        [TypeFilter(typeof(FileUploadValidationFilterAttribute))]
         public async Task<ActionResult<Uri>> Upload(
-            [FromForm] IFormFile file,
+            IFormFile file,
             [FromForm] string? description = null)
         {
             var fileRemoteUrl = await _fileUploadService.UploadFileAsync(file, description);
