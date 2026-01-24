@@ -1,7 +1,8 @@
 using Logging;
-using service.file.Configurations.Services;
 using NetUtils.Aspnet.Configurations;
 using NetUtils.Aspnet.Configurations.Swagger;
+using NetUtils.Aspnet.Filters;
+using service.file.Configurations.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,21 +15,14 @@ builder.ConfigApiVersion();
 builder.RegisterCommonServices();
 builder.RegisterServices();
 builder.Services.AllowCorsExt();
-builder.AddSwaggerGenExt($"{typeof(Program).Assembly.GetName().Name}.xml");
+builder.AddSwaggerGenExt($"{typeof(Program).Assembly.GetName().Name}.xml", swaggerGenOptions =>
+{
+    // support file button in swagger
+    swaggerGenOptions.OperationAsyncFilter<FileUploadOperationFilter>();
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwaggerExt();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+app.ConfigApp();
 
 app.Run();
