@@ -1,8 +1,10 @@
 ﻿using NetUtils.Repository;
 using repository.file.Repositories.Entities;
+using Utils.Ioc;
 
 namespace repository.file.Repositories
 {
+    [Register(Key = Constants.FileRepositoryIocKey, ServiceType = typeof(IRepository<UploadedItem, Guid>))]
     public class FileRepository : RepositoryBase<UploadedItem, Guid>, IFileRepository
     {
 

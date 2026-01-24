@@ -1,4 +1,5 @@
 ﻿using NetUtils.Aspnet.Configurations;
+using repository.file.Repositories;
 using service.file.Configurations.DomainSettings;
 
 namespace service.file.Configurations.Services
@@ -7,11 +8,11 @@ namespace service.file.Configurations.Services
     {
         public static void RegisterServices(this WebApplicationBuilder builder)
         {
-            builder.RegisterAssembliesAutofac(new[]
-            {
+            builder.RegisterAssembliesAutofac(
+            [
                 typeof(Program).Assembly,
-                //typeof(IShirtRepository).Assembly
-            });
+                typeof(IFileRepository).Assembly
+            ]);
             builder.RegisterMiddlewares();
             builder.Configurations();
         }

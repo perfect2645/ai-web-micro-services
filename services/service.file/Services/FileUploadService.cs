@@ -6,19 +6,21 @@ using NetUtils.Repository;
 using repository.file.Repositories.Entities;
 using service.file.Configurations.DomainSettings;
 using Utils.EncodingEx;
+using Utils.Ioc;
 
 namespace service.file.Services
 {
+    [Register(ServiceType = typeof(IFileUploadService))]
     public class FileUploadService : IFileUploadService
     {
 
-        private readonly IRepository<UploadedItem, string> _repository;
+        private readonly IRepository<UploadedItem, Guid> _repository;
         private readonly FileStorageSettings _fileStorageSettings;
-        private readonly HttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FileUploadService(IRepository<UploadedItem, string> repository, 
+        public FileUploadService([FromKeyedServices(repository.file.Constants.FileRepositoryIocKey)]IRepository<UploadedItem, Guid> repository, 
             IOptions<FileStorageSettings> fileStorageSettings,
-            HttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _fileStorageSettings = fileStorageSettings.Value;
