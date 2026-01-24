@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using repository.file.Repositories.Entities;
+using repository.doraemon.Repositories.Entities;
 
-namespace repository.file.Repositories
+namespace repository.doraemon.Repositories
 {
-    public class FileDbContext :DbContext
+    public class AppDbContext :DbContext
     {
 
         public DbSet<UploadedItem> UploadedItems { get; set; }
-        public FileDbContext(DbContextOptions<FileDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 

@@ -1,6 +1,6 @@
-﻿using repository.file.Repositories.Entities;
+﻿using repository.doraemon.Repositories.Entities;
 
-namespace repository.file.Repositories
+namespace repository.doraemon.Repositories
 {
     public interface IFileRepository
     {

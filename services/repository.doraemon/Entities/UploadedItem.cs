@@ -1,7 +1,7 @@
 ﻿using NetUtils.Aspnet.Repository;
 using System.ComponentModel.DataAnnotations;
 
-namespace repository.file.Repositories.Entities
+namespace repository.doraemon.Repositories.Entities
 {
     public record UploadedItem(
         [property: MaxLength(512)] string FileName,

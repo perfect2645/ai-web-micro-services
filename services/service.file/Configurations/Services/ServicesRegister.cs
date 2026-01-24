@@ -1,5 +1,5 @@
 ﻿using NetUtils.Aspnet.Configurations;
-using repository.file.Repositories;
+using repository.doraemon.Repositories;
 using service.file.Configurations.DomainSettings;
 
 namespace service.file.Configurations.Services

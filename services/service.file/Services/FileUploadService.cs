@@ -3,7 +3,7 @@ using Logging;
 using Microsoft.Extensions.Options;
 using NetUtils.Aspnet.Generic;
 using NetUtils.Repository;
-using repository.file.Repositories.Entities;
+using repository.doraemon.Repositories.Entities;
 using service.file.Configurations.DomainSettings;
 using Utils.EncodingEx;
 using Utils.Ioc;
@@ -18,7 +18,7 @@ namespace service.file.Services
         private readonly FileStorageSettings _fileStorageSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FileUploadService([FromKeyedServices(repository.file.Constants.FileRepositoryIocKey)]IRepository<UploadedItem, Guid> repository, 
+        public FileUploadService([FromKeyedServices(repository.doraemon.Constants.FileRepositoryIocKey)]IRepository<UploadedItem, Guid> repository, 
             IOptions<FileStorageSettings> fileStorageSettings,
             IHttpContextAccessor httpContextAccessor)
         {
