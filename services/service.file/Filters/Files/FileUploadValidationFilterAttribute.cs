@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using service.file.Configurations;
 using service.file.Services;
 using Utils.EncodingEx;
 
@@ -38,27 +39,27 @@ namespace service.file.Filters.Files
             {
                 fileDataStream.Position = 0;
             }
-            context.HttpContext.Items.Add("fileHash", hash);
+            context.HttpContext.Items.Add(Constants.Context_FileHash, hash);
             var existingFile = await _fileUploadService.GetUploadedItemAsync(fileItem.Length, hash);
             if (existingFile != null)
             {
-                context.HttpContext.Items.Add("existingFile", existingFile);
+                context.HttpContext.Items.Add(Constants.Context_ExistingFile, existingFile);
 
-                var fileExistsProblem = new ProblemDetails
-                {
-                    Status = StatusCodes.Status409Conflict,
-                    Title = "File already exists",
-                    Detail = $"A file with the same content (SHA256: {hash}) already exists in the system.",
-                    Instance = context.HttpContext.Request.Path
-                };
-                fileExistsProblem.Extensions.Add("existingFile", existingFile);
-                fileExistsProblem.Extensions.Add("fileHash", hash);
+                //var fileExistsProblem = new ProblemDetails
+                //{
+                //    Status = StatusCodes.Status409Conflict,
+                //    Title = "File already exists",
+                //    Detail = $"A file with the same content (SHA256: {hash}) already exists in the system.",
+                //    Instance = context.HttpContext.Request.Path
+                //};
+                //fileExistsProblem.Extensions.Add("existingFile", existingFile);
+                //fileExistsProblem.Extensions.Add("fileHash", hash);
 
-                context.Result = new ObjectResult(fileExistsProblem)
-                {
-                    StatusCode = StatusCodes.Status409Conflict
-                };
-                return;
+                //context.Result = new ObjectResult(fileExistsProblem)
+                //{
+                //    StatusCode = StatusCodes.Status409Conflict
+                //};
+                //return;
             }
 
             await next();
