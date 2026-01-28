@@ -1,7 +1,8 @@
 <Solution>
-  <Folder Name="/api.services/" />
+  <Folder Name="/api.services/">
+    <Project Path="../repository.doraemon/repository.doraemon.csproj" Id="761eff37-3781-4d26-a303-cd7d29d8f022" />
+  </Folder>
   <Folder Name="/api.services/file-service/">
-    <Project Path="../repository.file/repository.file.csproj" Id="761eff37-3781-4d26-a303-cd7d29d8f022" />
     <Project Path="service.file.csproj" />
   </Folder>
   <Folder Name="/shared/">

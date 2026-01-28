@@ -1,32 +1,35 @@
 ﻿using NetUtils.Aspnet.Configurations;
+using repository.doraemon.Repositories;
 using service.file.Configurations.DomainSettings;
 
 namespace service.file.Configurations.Services
 {
     public static class ServicesRegister
     {
-        public static void RegisterServices(this WebApplicationBuilder builder)
+        extension(WebApplicationBuilder builder)
         {
-            builder.RegisterAssembliesAutofac(new[]
+            public void RegisterServices()
             {
-                typeof(Program).Assembly,
-                //typeof(IShirtRepository).Assembly
-            });
-            builder.RegisterMiddlewares();
-            builder.Configurations();
-        }
+                builder.RegisterAssembliesAutofac(
+                [
+                    typeof(Program).Assembly,
+                    typeof(IFileRepository).Assembly // your repository assemblies
+                ]);
+                builder.RegisterMiddlewares();
+                builder.Configurations();
+            }
 
-        private static void RegisterMiddlewares(this WebApplicationBuilder builder)
-        {
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            private void RegisterMiddlewares()
+            {
+                // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+                builder.Services.AddOpenApi();
+            }
 
-            //builder.Services.AddApiVersioning()
-        }
-
-        private static void Configurations(this WebApplicationBuilder builder)
-        {
-            builder.Services.Configure<Settings>(builder.Configuration.GetSection(Constants.Settings));
+            private void Configurations()
+            {
+                // build your customized configs under appsettings.json
+                builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(Constants.FileStorageSettings));
+            }
         }
     }
 }

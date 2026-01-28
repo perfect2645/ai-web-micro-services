@@ -1,12 +1,14 @@
 ﻿using NetUtils.Repository;
-using repository.file.Repositories.Entities;
+using repository.doraemon.Repositories.Entities;
+using Utils.Ioc;
 
-namespace repository.file.Repositories
+namespace repository.doraemon.Repositories
 {
+    [Register(Key = Constants.FileRepositoryIocKey, ServiceType = typeof(IRepository<UploadedItem, Guid>))]
     public class FileRepository : RepositoryBase<UploadedItem, Guid>, IFileRepository
     {
 
-        public FileRepository(FileDbContext fileDbContext) : base(fileDbContext)
+        public FileRepository(AppDbContext fileDbContext) : base(fileDbContext)
         {
         }
 
