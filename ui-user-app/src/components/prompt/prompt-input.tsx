@@ -84,13 +84,13 @@ const PromptInput: React.FC<PromptInputProps> = ({
         return {
           valid: false,
           message: `单张图片大小不能超过${(maxImageSize / 1024 / 1024).toFixed(
-            1
+            1,
           )}MB`,
         };
       }
       return { valid: true };
     },
-    [acceptImageTypes, maxImageSize]
+    [acceptImageTypes, maxImageSize],
   );
 
   // 处理图片添加（统一处理选择/粘贴/拖拽的图片）
@@ -136,7 +136,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       textValue,
       imageList,
       onChange,
-    ]
+    ],
   );
 
   // 1. 选择图片：触发文件选择器
@@ -152,7 +152,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       // 重置文件选择器（允许重复选择同一张图片）
       if (e.target) e.target.value = "";
     },
-    [handleAddImages]
+    [handleAddImages],
   );
 
   // 3. 粘贴图片：处理剪贴板粘贴
@@ -169,7 +169,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       }
       // 无图片时，允许正常文字粘贴（无需阻止默认行为）
     },
-    [disabled, handleAddImages]
+    [disabled, handleAddImages],
   );
 
   // 4. 拖拽图片：拖拽进入
@@ -179,7 +179,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       e.stopPropagation();
       if (!disabled) setIsDragOver(true);
     },
-    [disabled]
+    [disabled],
   );
 
   // 4. 拖拽图片：拖拽悬浮
@@ -189,7 +189,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       e.stopPropagation();
       if (!disabled) setIsDragOver(true);
     },
-    [disabled]
+    [disabled],
   );
 
   // 4. 拖拽图片：拖拽离开
@@ -199,7 +199,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       e.stopPropagation();
       if (!disabled) setIsDragOver(false);
     },
-    [disabled]
+    [disabled],
   );
 
   // 4. 拖拽图片：拖拽放下
@@ -212,7 +212,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       const files = e.dataTransfer.files;
       handleAddImages(files);
     },
-    [disabled, handleAddImages]
+    [disabled, handleAddImages],
   );
 
   // 处理图片删除
@@ -222,7 +222,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       const newImageList = imageList.filter((img) => img.id !== imageId);
       onChange(textValue, newImageList);
     },
-    [disabled, imageList, textValue, onChange]
+    [disabled, imageList, textValue, onChange],
   );
 
   // 处理文字输入变更
@@ -231,7 +231,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       if (disabled) return;
       onChange(e.target.value, imageList);
     },
-    [disabled, imageList, onChange]
+    [disabled, imageList, onChange],
   );
 
   // 处理键盘事件（回车提交，Ctrl/Command+回车换行）
@@ -246,7 +246,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
         }
       }
     },
-    [disabled, textValue, imageList, onSubmit]
+    [disabled, textValue, imageList, onSubmit],
   );
 
   // 处理手动提交
