@@ -321,7 +321,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
           onClick={handleSubmitClick}
           disabled={disabled || (!textValue.trim() && imageList.length === 0)}
         >
-          发送
+          Send
         </button>
 
         {/* 隐藏的文件选择器 */}
