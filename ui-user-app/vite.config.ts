@@ -13,5 +13,11 @@ export default defineConfig({
   },
   server: {
     allowedHosts: ["home.fawei.dpdns.org"], // 加入被拦截的主机
+    https: {
+      cert: path.resolve(__dirname, "./ssl/localhost-doraemon-cert.pem"),
+      key: path.resolve(__dirname, "./ssl/localhost-doraemon-key.pem"),
+    },
+    port: 3000,
+    open: true,
   },
 });
