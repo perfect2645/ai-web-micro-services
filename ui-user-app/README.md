@@ -82,15 +82,27 @@ export default defineConfig([
 
    > yarn global add serve
 
-3. serve -s dist
+3. serve -s dist (http)
+
+- https version
+
+```
+serve -s dist `
+  --ssl-cert ./ssl/localhost-doraemon-cert.pem `
+  --ssl-key ./ssl/localhost-doraemon-key.pem `
+  -l 3001
+```
 
 - requires add yarn to environment path (C:\Users\Admin\AppData\Local\Yarn\bin)
 
-4. start nginx
+1. start nginx
 
 > start nginx
 > nginx.exe -s quit
 > nginx.exe -s reload
 
-5. open http://localhost:3000
-   > cloudflare path : https://home.fawei.dpdns.org/
+5. open http://localhost:3000(http)
+
+- https : https://localhost:3001
+
+  > cloudflare path : https://home.fawei.dpdns.org/
