@@ -36,7 +36,7 @@ namespace service.file.Controllers.Files
 
         [HttpPost]
         [TypeFilter(typeof(FileUploadValidationFilterAttribute))]
-        public async Task<ActionResult<Uri>> Upload(
+        public async Task<ActionResult<UploadedItem>> Upload(
             IFormFile file,
             [FromForm] string? description = null)
         {
