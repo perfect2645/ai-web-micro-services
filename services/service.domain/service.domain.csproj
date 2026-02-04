@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="C:\Users\Admin\.nuget\packages\net.logging.perfect2645\1.1.0\contentFiles\any\net10.0\log4net.config" Link="log4net.config">
+      <Private>False</Private>
+      <NuGetPackageVersion>1.1.0</NuGetPackageVersion>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <NuGetItemType>Content</NuGetItemType>
+      <NuGetPackageId>net.logging.perfect2645</NuGetPackageId>
+      <Pack>false</Pack>
+    </Content>
     <Content Include="Configurations\Certs\localhost-doraemon.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -22,10 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\CSharp\Laboratory\NetUtils\NetUtils.csproj" />
     <ProjectReference Include="..\repository.doraemon\repository.doraemon.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

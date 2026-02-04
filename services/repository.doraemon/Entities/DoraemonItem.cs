@@ -11,16 +11,21 @@ namespace repository.doraemon.Entities
         [property: Required]
         Guid InputImageId,
 
+        [property:Required]
+        string InputImageUrl,
+
         [property: MaxLength(512)] 
         string? PromptText
     ) : IEntity, IEntityTiming
     {
         public Guid Id { get; init; } = Guid.NewGuid();
         public DateTime CreateTime { get; init; } = DateTime.Now;
-        public DateTime? UpdateTime { get; private set; }
+        public DateTime? UpdateTime { get; set; }
 
         [Required]
         public ImageRecognitionStatus Status { get; set; } = ImageRecognitionStatus.Prompt;
+        public string? ErrorMessage { get; set; } = string.Empty;
         public Guid? OutputImageId { get;set; }
-    }
+        public string? OutputImageUrl { get;set; }
+}
 }

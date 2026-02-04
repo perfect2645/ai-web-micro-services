@@ -12,7 +12,7 @@ namespace service.domain.Configurations.Services
                 builder.RegisterAssembliesAutofac(
                 [
                     typeof(Program).Assembly,
-                    //typeof(IFileRepository).Assembly // your repository assemblies
+                    typeof(IFileRepository).Assembly // your repository assemblies
                 ]);
                 builder.RegisterMiddlewares();
                 builder.Configurations();

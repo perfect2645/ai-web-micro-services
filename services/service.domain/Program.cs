@@ -3,6 +3,7 @@ using NetUtils.Aspnet.Configurations;
 using NetUtils.Aspnet.Configurations.Swagger;
 using NetUtils.Repository.Configurations;
 using repository.doraemon.Repositories;
+using service.domain.Configurations.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

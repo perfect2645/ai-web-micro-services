@@ -37,12 +37,9 @@ namespace repository.doraemon.Repositories
                 entity.HasKey(entity => entity.Id).IsClustered(false);
                 entity.Property(entity => entity.UserId).IsRequired().HasMaxLength(64);
                 entity.Property(entity => entity.InputImageId).IsRequired();
-                entity.HasIndex(entity => new { entity.UserId, entity.InputImageId }).IsUnique();
+                entity.Property(entity => entity.InputImageUrl).IsRequired();
+                entity.HasIndex(entity => new { entity.UserId, entity.CreateTime });
 
-                //entity.Property(x => x.FileSize).IsRequired();
-                //entity.Property(x => x.FileHash).IsRequired();
-                //entity.Property(x => x.BackupUrl).IsRequired();
-                //entity.Property(x => x.RemoteUrl).IsRequired();
                 entity.Property(x => x.CreateTime).IsRequired();
             });
         }
