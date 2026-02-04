@@ -18,7 +18,7 @@ namespace service.domain.Controllers
         private readonly IImageDataService _imageDataService = imageDataService;
 
 
-        [HttpGet("{userid : string}")]
+        [HttpGet("userId")]
         public async Task<ActionResult<ApiResponse<List<DoraemonItem>?>>> GetByUserId(string userId)
         {
             var items = await _imageDataService.GetByUserIdAsync(userId);

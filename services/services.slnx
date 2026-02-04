@@ -13,4 +13,7 @@
     <Project Path="../../../../CSharp/Laboratory/NetUtils/NetUtils.csproj" />
     <Project Path="../../../../CSharp/Laboratory/Utils/Utils.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
 </Solution>

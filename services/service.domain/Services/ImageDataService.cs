@@ -1,9 +1,11 @@
 ﻿using repository.doraemon.Entities;
 using repository.doraemon.Repositories.Domain;
 using service.domain.Models;
+using Utils.Ioc;
 
 namespace service.domain.Services
 {
+    [Register]
     public class ImageDataService(IImageDataRepository imageDataRepository) : IImageDataService
     {
         private readonly IImageDataRepository _imageDataRepository = imageDataRepository;
