@@ -16,7 +16,7 @@ export interface PromptInputProps {
   // 内容变更回调（返回文字和图片列表）
   onChange: (text: string, image: PromptImage) => void;
   // 提交回调（点击提交/回车提交时触发）
-  onSubmit: () => void;
+  onSubmit: (text: string, image: PromptImage) => void;
   // 占位提示文字
   placeholder?: string;
   // 自定义类名
@@ -42,7 +42,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
   acceptImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"],
   maxImageSize = 20 * 1024 * 1024, // 20MB
 }) => {
-  const [text, setText] = useState<string>('');
+  const [text, setText] = useState<string>("");
   const [img, setImg] = useState<PromptImage>();
   // 拖拽悬浮状态
   const [isDragOver, setIsDragOver] = useState(false);
@@ -218,10 +218,10 @@ const PromptInput: React.FC<PromptInputProps> = ({
   // 处理手动提交
   const handleSubmitClick = useCallback(() => {
     if (disabled) return;
-    if (text.trim() || img) {
-      onSubmit();
+    if (img) {
+      onSubmit(text, img);
     } else {
-      alert("请输入文字或上传图片后提交");
+      alert("Please prompt image for submission.");
     }
   }, [disabled, text, img, onSubmit]);
 

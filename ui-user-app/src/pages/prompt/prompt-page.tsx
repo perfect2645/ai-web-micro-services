@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PromptInput, { PromptImage } from "@/components/prompt/prompt-input";
 import { FileResponse } from "@/types";
+import { v4 as uuidv4 } from "uuid";
 
 const blessingList = [
   "新年快乐！",
@@ -26,15 +27,15 @@ const blessingList = [
 ];
 
 const PromptPage: React.FC = () => {
-  const [imgId, setImgId] = useState<string>("");
+  const [imgData, setImgData] = useState<FileResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false); // 添加提交状态
 
   // 上传图片到服务器
   const uploadImages = async (
     image: PromptImage,
     description: string,
-  ): Promise<string> => {
-    if (!image) return "";
+  ): Promise<FileResponse> => {
+    if (!image) return null as unknown as FileResponse;
 
     const formData = new FormData();
     formData.append("file", image.file, image.name);
@@ -53,7 +54,7 @@ const PromptPage: React.FC = () => {
       }
 
       const result: FileResponse = await response.json();
-      return result.id;
+      return result;
     } catch (error) {
       console.error(`上传图片 ${image.name} 失败:`, error);
       throw new Error(
@@ -64,22 +65,31 @@ const PromptPage: React.FC = () => {
 
   // 处理内容变更
   const handlePromptChange = async (text: string, image: PromptImage) => {
-    const imgId = await uploadImages(image, text);
-    setImgId(imgId);
+    const imageData = await uploadImages(image, text);
+    setImgData(imageData);
     console.log("当前输入：", text);
-    console.log("当前图片：", imgId);
+    console.log("当前图片：", imageData.remoteUrl);
   };
 
   // 处理提交
-  const handlePromptSubmit = async () => {
+  const handlePromptSubmit = async (text: string, image: PromptImage) => {
     if (isSubmitting) return; // 防止重复提交
 
     setIsSubmitting(true);
 
+    const formData = new FormData();
+    const tempUserId = uuidv4();
+    formData.append("userId", tempUserId);
+    formData.append("inputImageId", imgData ? imgData.id : "");
+    formData.append("inputImageUrl", imgData ? imgData.remoteUrl : "");
+    formData.append("propmtText", text);
+
     try {
-      // 如果有图片，先上传图片到服务器
-      await fetch("secondApiCall");
-      setImgId("");
+      await fetch("/api/doraemon", {
+        method: "POST",
+        body: formData,
+      });
+      setImgData(null);
 
       const randomBlessing =
         blessingList[Math.floor(Math.random() * blessingList.length)];
