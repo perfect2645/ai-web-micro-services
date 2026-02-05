@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using repository.doraemon.Entities;
 using repository.doraemon.Repositories.Entities;
 
 namespace repository.doraemon.Repositories
@@ -7,6 +8,7 @@ namespace repository.doraemon.Repositories
     {
 
         public DbSet<UploadedItem> UploadedItems { get; set; }
+        public DbSet<DoraemonItem> DoraemonItems { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -27,6 +29,17 @@ namespace repository.doraemon.Repositories
                 entity.Property(x => x.FileHash).IsRequired();
                 entity.Property(x => x.BackupUrl).IsRequired();
                 entity.Property(x => x.RemoteUrl).IsRequired();
+                entity.Property(x => x.CreateTime).IsRequired();
+            });
+
+            modelBuilder.Entity<DoraemonItem>(entity =>
+            {
+                entity.HasKey(entity => entity.Id).IsClustered(false);
+                entity.Property(entity => entity.UserId).IsRequired().HasMaxLength(64);
+                entity.Property(entity => entity.InputImageId).IsRequired();
+                entity.Property(entity => entity.InputImageUrl).IsRequired();
+                entity.HasIndex(entity => new { entity.UserId, entity.CreateTime });
+
                 entity.Property(x => x.CreateTime).IsRequired();
             });
         }
