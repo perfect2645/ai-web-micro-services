@@ -42,11 +42,12 @@ const PromptPage: React.FC = () => {
 
     try {
       //Patrick notes: 设置跨域的话，这里只需要把url的path => /api/file
-      const response = await fetch("https://home.fawei.dpdns.org/api/file", {
+      const response = await fetch("/api/file", {
         method: "POST",
         body: formData,
       });
 
+      console.log("上传结果:", response);
       if (!response.ok) {
         throw new Error(`上传失败: ${response.status} ${response.statusText}`);
       }
@@ -62,8 +63,7 @@ const PromptPage: React.FC = () => {
   };
 
   // 处理内容变更
-  const handlePromptChange = async (text: string, images: PromptImage[]) => {
-    const image = images[0]; // 只处理第一张图片
+  const handlePromptChange = async (text: string, image: PromptImage) => {
     const imgId = await uploadImages(image, text);
     setImgId(imgId);
     console.log("当前输入：", text);
