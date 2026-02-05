@@ -5,8 +5,8 @@ using Utils.Ioc;
 
 namespace service.domain.Services
 {
-    [Register]
-    public class ImageDataService(IImageDataRepository imageDataRepository) : IImageDataService
+    [Register(ServiceType = typeof(IImageDataService))]
+    public class ImageDataService([FromKeyedServices(repository.doraemon.Constants.ImageDataRepositoryIocKey)] IImageDataRepository imageDataRepository) : IImageDataService
     {
         private readonly IImageDataRepository _imageDataRepository = imageDataRepository;
         public async Task<IReadOnlyList<DoraemonItem>?> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
