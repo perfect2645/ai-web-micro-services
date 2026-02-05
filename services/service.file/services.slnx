@@ -2,6 +2,7 @@
   <Folder Name="/api.services/">
     <Project Path="../repository.doraemon/repository.doraemon.csproj" Id="761eff37-3781-4d26-a303-cd7d29d8f022" />
   </Folder>
+  <Folder Name="/api.services/domain-service/" />
   <Folder Name="/api.services/file-service/">
     <Project Path="service.file.csproj" />
   </Folder>

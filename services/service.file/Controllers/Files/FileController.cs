@@ -11,17 +11,10 @@ namespace service.file.Controllers.Files
     [ApiController]
     [Route("api/[controller]")]
     [ApiVersion(1.0)]
-    public class FileController : ControllerBase
+    public class FileController(ILogger<FileController> logger, IFileUploadService fileUploadService) : ControllerBase
     {
-
-        private readonly ILogger<FileController> _logger;
-        private readonly IFileUploadService _fileUploadService;
-
-        public FileController(ILogger<FileController> logger, IFileUploadService fileUploadService)
-        {
-            _logger = logger;
-            _fileUploadService = fileUploadService;
-        }
+        private readonly ILogger<FileController> _logger = logger;
+        private readonly IFileUploadService _fileUploadService = fileUploadService;
 
         [HttpGet]
         [TypeFilter(typeof(FileKeyValidationFilterAttribute))]
