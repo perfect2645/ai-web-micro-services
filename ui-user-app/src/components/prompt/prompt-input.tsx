@@ -13,14 +13,10 @@ export interface PromptImage {
 
 // 组件属性类型定义
 export interface PromptInputProps {
-  // 文字输入内容（受控属性）
-  textValue: string;
-  // 图片列表（受控属性）
-  imageList: PromptImage[];
   // 内容变更回调（返回文字和图片列表）
-  onChange: (text: string, images: PromptImage[]) => void;
+  onChange: (text: string, image: PromptImage) => void;
   // 提交回调（点击提交/回车提交时触发）
-  onSubmit: (text: string, images: PromptImage[]) => void;
+  onSubmit: (text: string, image: PromptImage) => void;
   // 占位提示文字
   placeholder?: string;
   // 自定义类名
@@ -38,8 +34,6 @@ export interface PromptInputProps {
  * 支持：文字输入、图片选择、图片粘贴、图片拖拽上传
  */
 const PromptInput: React.FC<PromptInputProps> = ({
-  textValue,
-  imageList,
   onChange,
   onSubmit,
   placeholder = "prompt text or image ...",
@@ -48,6 +42,8 @@ const PromptInput: React.FC<PromptInputProps> = ({
   acceptImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"],
   maxImageSize = 20 * 1024 * 1024, // 20MB
 }) => {
+  const [text, setText] = useState<string>("");
+  const [img, setImg] = useState<PromptImage>();
   // 拖拽悬浮状态
   const [isDragOver, setIsDragOver] = useState(false);
   // 文件选择器Ref
@@ -98,34 +94,28 @@ const PromptInput: React.FC<PromptInputProps> = ({
     async (files: FileList | null) => {
       if (!files || files.length === 0 || disabled) return;
 
-      const newImages: PromptImage[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        // 校验文件
-        const validateResult = validateImageFile(file);
-        if (!validateResult.valid) {
-          alert(validateResult.message);
-          continue;
-        }
-        // 转Base64获取预览地址
-        try {
-          const url = await fileToBase64(file);
-          newImages.push({
-            id: generateImageId(),
-            file,
-            url,
-            name: file.name,
-            size: file.size,
-          });
-        } catch (err) {
-          console.error("图片转Base64失败：", err);
-          alert("图片预览失败，请重新上传");
-        }
+      const file = files[0];
+      // 校验文件
+      const validateResult = validateImageFile(file);
+      if (!validateResult.valid) {
+        alert(validateResult.message);
+        return;
       }
-
-      // 触发变更回调
-      if (newImages.length > 0) {
-        onChange(textValue, [...imageList, ...newImages]);
+      // 转Base64获取预览地址
+      try {
+        const url = await fileToBase64(file);
+        const newImage = {
+          id: generateImageId(),
+          file,
+          url,
+          name: file.name,
+          size: file.size,
+        };
+        setImg(newImage);
+        onChange(text, newImage);
+      } catch (err) {
+        console.error("图片转Base64失败：", err);
+        alert("图片预览失败，请重新上传");
       }
     },
     [
@@ -133,8 +123,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
       validateImageFile,
       fileToBase64,
       generateImageId,
-      textValue,
-      imageList,
+      text,
       onChange,
     ],
   );
@@ -215,6 +204,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
     [disabled, handleAddImages],
   );
 
+  /*
   // 处理图片删除
   const handleRemoveImage = useCallback(
     (imageId: string) => {
@@ -223,41 +213,17 @@ const PromptInput: React.FC<PromptInputProps> = ({
       onChange(textValue, newImageList);
     },
     [disabled, imageList, textValue, onChange],
-  );
-
-  // 处理文字输入变更
-  const handleTextChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      if (disabled) return;
-      onChange(e.target.value, imageList);
-    },
-    [disabled, imageList, onChange],
-  );
-
-  // 处理键盘事件（回车提交，Ctrl/Command+回车换行）
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (disabled) return;
-      // 纯回车提交（非Ctrl/Command+回车）
-      if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        if (textValue.trim() || imageList.length > 0) {
-          onSubmit(textValue.trim(), imageList);
-        }
-      }
-    },
-    [disabled, textValue, imageList, onSubmit],
-  );
+  );*/
 
   // 处理手动提交
   const handleSubmitClick = useCallback(() => {
     if (disabled) return;
-    if (textValue.trim() || imageList.length > 0) {
-      onSubmit(textValue.trim(), imageList);
+    if (img) {
+      onSubmit(text, img);
     } else {
-      alert("请输入文字或上传图片后提交");
+      alert("Please prompt image for submission.");
     }
-  }, [disabled, textValue, imageList, onSubmit]);
+  }, [disabled, text, img, onSubmit]);
 
   return (
     <div
@@ -270,39 +236,31 @@ const PromptInput: React.FC<PromptInputProps> = ({
       onDrop={handleDrop}
     >
       {/* 图片预览列表 */}
-      {imageList.length > 0 && (
+      {img && (
         <div className={classes.promptImageList}>
-          {imageList.map((image) => (
-            <div key={image.id} className={classes.promptImageCard}>
-              <img
-                src={image.url}
-                alt={image.name}
-                className={classes.promptImagePreview}
-              />
-              <div
-                className={classes.promptImageRemove}
-                onClick={() => handleRemoveImage(image.id)}
-              >
-                ✕
-              </div>
-              <div className={classes.promptImageInfo}>
-                <span className={classes.promptImageName}>{image.name}</span>
-                <span className={classes.promptImageSize}>
-                  {(image.size / 1024 / 1024).toFixed(2)}MB
-                </span>
-              </div>
+          <div key={img.id} className={classes.promptImageCard}>
+            <img
+              src={img.url}
+              alt={img.name}
+              className={classes.promptImagePreview}
+            />
+            <div className={classes.promptImageRemove}>✕</div>
+            <div className={classes.promptImageInfo}>
+              <span className={classes.promptImageName}>{img.name}</span>
+              <span className={classes.promptImageSize}>
+                {(img.size / 1024 / 1024).toFixed(2)}MB
+              </span>
             </div>
-          ))}
+          </div>
         </div>
       )}
 
       {/* 文字输入框 */}
       <textarea
         className={classes.promptTextarea}
-        value={textValue}
-        onChange={handleTextChange}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
         onPaste={handlePaste}
-        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         disabled={disabled}
         rows={4}
@@ -319,19 +277,19 @@ const PromptInput: React.FC<PromptInputProps> = ({
           type="button"
           className={`${classes.promptBtn} ${classes.promptBtnSubmit}`}
           onClick={handleSubmitClick}
-          disabled={disabled || (!textValue.trim() && imageList.length === 0)}
+          disabled={disabled || (!text.trim() && !!img)}
         >
           Send
         </button>
 
         {/* 隐藏的文件选择器 */}
         <input
+          className="hidden"
           ref={fileInputRef}
           type="file"
           multiple
           accept={acceptImageTypes.join(",")}
           onChange={handleFileInputChange}
-          style={{ display: "none" }}
         />
       </div>
     </div>

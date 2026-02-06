@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import PromptInput, { PromptImage } from "@/components/prompt/prompt-input";
+import { FileResponse } from "@/types";
+import { v4 as uuidv4 } from "uuid";
 
 const blessingList = [
   "新年快乐！",
@@ -25,35 +27,79 @@ const blessingList = [
 ];
 
 const PromptPage: React.FC = () => {
-  // 管理文字内容和图片列表
-  const [textValue, setTextValue] = useState("");
-  const [imageList, setImageList] = useState<PromptImage[]>([]);
+  const [imgData, setImgData] = useState<FileResponse | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // 添加提交状态
+
+  // 上传图片到服务器
+  const uploadImages = async (
+    image: PromptImage,
+    description: string,
+  ): Promise<FileResponse> => {
+    if (!image) return null as unknown as FileResponse;
+
+    const formData = new FormData();
+    formData.append("file", image.file, image.name);
+    formData.append("description", description);
+
+    try {
+      //Patrick notes: 设置跨域的话，这里只需要把url的path => /api/file
+      const response = await fetch("/api/file", {
+        method: "POST",
+        body: formData,
+      });
+
+      console.log("上传结果:", response);
+      if (!response.ok) {
+        throw new Error(`上传失败: ${response.status} ${response.statusText}`);
+      }
+
+      const result: FileResponse = await response.json();
+      return result;
+    } catch (error) {
+      console.error(`上传图片 ${image.name} 失败:`, error);
+      throw new Error(
+        `图片 "${image.name}" 上传失败: ${(error as Error).message}`,
+      );
+    }
+  };
 
   // 处理内容变更
-  const handlePromptChange = (text: string, images: PromptImage[]) => {
-    setTextValue(text);
-    setImageList(images);
+  const handlePromptChange = async (text: string, image: PromptImage) => {
+    const imageData = await uploadImages(image, text);
+    setImgData(imageData);
     console.log("当前输入：", text);
-    console.log("当前图片：", images);
+    console.log("当前图片：", imageData.remoteUrl);
   };
 
   // 处理提交
-  const handlePromptSubmit = (text: string, images: PromptImage[]) => {
-    console.log("提交内容：", text);
-    console.log("提交图片：", images);
+  const handlePromptSubmit = async (text: string, image: PromptImage) => {
+    if (isSubmitting) return; // 防止重复提交
 
-    // 这里可添加接口请求逻辑（如上传图片、发送Prompt）
-    // 示例：获取图片文件对象用于上传
-    // const imageFiles = images.map(img => img.file);
-    // await uploadImages(imageFiles);
-    // await sendPrompt(text);
+    setIsSubmitting(true);
 
-    // 提交后清空内容（可选）
-    setTextValue("");
-    setImageList([]);
-    const randomBlessing =
-      blessingList[Math.floor(Math.random() * blessingList.length)];
-    alert(randomBlessing);
+    const formData = new FormData();
+    const tempUserId = uuidv4();
+    formData.append("userId", tempUserId);
+    formData.append("inputImageId", imgData ? imgData.id : "");
+    formData.append("inputImageUrl", imgData ? imgData.remoteUrl : "");
+    formData.append("propmtText", text);
+
+    try {
+      await fetch("/api/doraemon", {
+        method: "POST",
+        body: formData,
+      });
+      setImgData(null);
+
+      const randomBlessing =
+        blessingList[Math.floor(Math.random() * blessingList.length)];
+      alert(`提交成功！${randomBlessing}`);
+    } catch (error) {
+      console.error("提交失败:", error);
+      alert(`提交失败: ${(error as Error).message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -62,12 +108,15 @@ const PromptPage: React.FC = () => {
         Prompt with text and image
       </h2>
       <PromptInput
-        textValue={textValue}
-        imageList={imageList}
         onChange={handlePromptChange}
         onSubmit={handlePromptSubmit}
         placeholder="Please enter your question, or upload an image for assistance..."
       />
+      {isSubmitting && (
+        <div style={{ textAlign: "center", marginTop: 10, color: "#6b7280" }}>
+          正在上传图片...
+        </div>
+      )}
     </div>
   );
 };

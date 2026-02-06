@@ -19,5 +19,22 @@ export default defineConfig({
     },
     port: 3000,
     open: true,
+    proxy: {
+      // 关键：将 /api 开头的请求转发到后端
+      "/api/file": {
+        target: "https://127.0.0.1:7092", // ❗ 替换成你的后端实际地址（端口改成后端端口）
+        changeOrigin: true, // 必须加，解决跨域
+        secure: false, // 忽略自签名证书错误（关键！解决HTTPS证书问题）
+        ws: true, // 如果有WebSocket可保留
+        rewrite: (path) => path, // 无需重写路径，直接转发
+      },
+      "/api/doraemon": {
+        target: "https://127.0.0.1:7093", // ❗ 替换成你的后端实际地址（端口改成后端端口）
+        changeOrigin: true, // 必须加，解决跨域
+        secure: false, // 忽略自签名证书错误（关键！解决HTTPS证书问题）
+        ws: true, // 如果有WebSocket可保留
+        rewrite: (path) => path, // 无需重写路径，直接转发
+      },
+    },
   },
 });
