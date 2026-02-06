@@ -25,7 +25,7 @@ namespace WebapiMq.Configurations
 
             private void Configurations()
             {
-                builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection(Constants.RabbitMqSettings));
+                builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection(MessagingConstants.RabbitMqSettings));
             }
         }
     }

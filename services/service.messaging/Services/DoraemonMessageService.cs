@@ -1,5 +1,5 @@
-﻿using Utils.Ioc;
-using WebapiMq.Clients.Producer;
+﻿using service.messaging.Clients.RabbitMq.Producer;
+using Utils.Ioc;
 using WebapiMq.Model;
 
 namespace WebapiMq.Services
@@ -8,7 +8,7 @@ namespace WebapiMq.Services
     public class DoraemonMessageService : IDoraemonMessageService
     {
         private IRabbitMqProducer<DoraemonMessage> _queueModeMqProducer;
-        public DoraemonMessageService([FromKeyedServices(Constants.Ioc_RabbitMq_QueueMode)]IRabbitMqProducer<DoraemonMessage> queueModeMqProducer)
+        public DoraemonMessageService([FromKeyedServices(MessagingConstants.Ioc_RabbitMq_QueueMode)]IRabbitMqProducer<DoraemonMessage> queueModeMqProducer)
         {
             _queueModeMqProducer = queueModeMqProducer;
         }

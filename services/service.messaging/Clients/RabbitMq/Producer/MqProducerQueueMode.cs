@@ -1,29 +1,29 @@
 ﻿using Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
+using service.messaging.Clients.RabbitMq.Connections;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Channels;
 using Utils.Ioc;
 using Utils.Tasking;
-using WebapiMq.Clients.Connections;
+using WebapiMq;
 using WebapiMq.Configurations;
 using WebapiMq.Model;
 
-namespace WebapiMq.Clients.Producer
+namespace service.messaging.Clients.RabbitMq.Producer
 {
-    [Register(ServiceType = typeof(IRabbitMqProducer<DoraemonMessage>), Key = Constants.Ioc_RabbitMq_QueueMode, Lifetime = Lifetime.Singleton)]
+    [Register(ServiceType = typeof(IRabbitMqProducer<DoraemonMessage>), Key = MessagingConstants.Ioc_RabbitMq_QueueMode, Lifetime = Lifetime.Singleton)]
     public class MqProducerQueueMode : IRabbitMqProducer<DoraemonMessage>
     {
         private readonly IDoraemonMqConnectionFactory _connectionFactory;
-        private IChannel _channel;
+        private IChannel? _channel;
         private readonly Task _connectionBuildingTask;
 
         private const string QueueName = "doraemon.queue";
 
         #region Init
 
-        public MqProducerQueueMode([FromKeyedServices(Constants.Ioc_RabbitMq_Conn_ImageData)] IDoraemonMqConnectionFactory connectionFactory)
+        public MqProducerQueueMode([FromKeyedServices(MessagingConstants.Ioc_RabbitMq_Conn_ImageData)] IDoraemonMqConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
 
@@ -66,7 +66,7 @@ namespace WebapiMq.Clients.Producer
             {
                 var jsonMsg = JsonSerializer.Serialize(messagePayload);
                 byte[] msgBody = Encoding.UTF8.GetBytes(jsonMsg);
-                await _channel.BasicPublishAsync(exchange: string.Empty,
+                await _channel!.BasicPublishAsync(exchange: string.Empty,
                     routingKey: QueueName,
                     mandatory: true,
                     basicProperties: properties,

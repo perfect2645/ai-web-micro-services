@@ -1,10 +1,10 @@
 ﻿using RabbitMQ.Client;
 
-namespace WebapiMq.Clients.Connections
+namespace service.messaging.Clients.RabbitMq.Connections
 {
     public interface IDoraemonMqConnectionFactory
     {
-        ConnectionFactory ConnectionFactory { get; }
+        ConnectionFactory? ConnectionFactory { get; }
         ValueTask<IConnection> GetConnectionAsync();
     }
 }

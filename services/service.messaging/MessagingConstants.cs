@@ -1,6 +1,6 @@
 ﻿namespace WebapiMq
 {
-    public class Constants
+    public class MessagingConstants
     {
         public const string RabbitMqSettings = "RabbitMqSettings";
 
