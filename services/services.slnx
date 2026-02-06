@@ -13,6 +13,7 @@
   </Folder>
   <Folder Name="/shared/">
     <Project Path="../../../../CSharp/Laboratory/Logging/Logging.csproj" />
+    <Project Path="../../../../CSharp/Laboratory/Messaging/Messaging.csproj" Id="038c292a-ee7b-4286-bbb6-e8685dee8026" />
     <Project Path="../../../../CSharp/Laboratory/NetUtils/NetUtils.csproj" />
     <Project Path="../../../../CSharp/Laboratory/Utils/Utils.csproj" />
   </Folder>
