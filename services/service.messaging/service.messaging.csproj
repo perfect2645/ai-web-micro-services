@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>c7a3bfa0-99a7-4971-8fc3-f4ea7da90e6d</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="C:\Users\Admin\.nuget\packages\net.logging.perfect2645\1.1.0\contentFiles\any\net10.0\log4net.config" Link="log4net.config">
+      <Private>False</Private>
+      <NuGetPackageVersion>1.1.0</NuGetPackageVersion>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <NuGetItemType>Content</NuGetItemType>
+      <NuGetPackageId>net.logging.perfect2645</NuGetPackageId>
+      <Pack>false</Pack>
+    </Content>
+    <Content Include="Configurations\Certs\localhost-doraemon.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\CSharp\Laboratory\NetUtils\NetUtils.csproj" />
+  </ItemGroup>
+
+</Project>

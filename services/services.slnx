@@ -8,6 +8,9 @@
   <Folder Name="/api.services/file-service/">
     <Project Path="service.file/service.file.csproj" />
   </Folder>
+  <Folder Name="/api.services/messaging-service/">
+    <Project Path="service.messaging/service.messaging.csproj" Id="e42226ed-abeb-4696-834d-67bd5581febb" />
+  </Folder>
   <Folder Name="/shared/">
     <Project Path="../../../../CSharp/Laboratory/Logging/Logging.csproj" />
     <Project Path="../../../../CSharp/Laboratory/NetUtils/NetUtils.csproj" />
