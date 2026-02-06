@@ -10,5 +10,6 @@ namespace service.domain.Services
             CancellationToken cancellationToken = default);
 
         Task UpdateAsync(DoraemonItem item, CancellationToken cancellationToken = default);
+        Task PublishMqAsync(DoraemonItem doraemonMqData, CancellationToken cancellationToken = default);
     }
 }

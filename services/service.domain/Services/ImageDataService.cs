@@ -1,14 +1,21 @@
-﻿using repository.doraemon.Entities;
+﻿using Logging;
+using repository.doraemon.Entities;
 using repository.doraemon.Repositories.Domain;
 using service.domain.Models;
+using service.messaging.Clients.Producer;
 using Utils.Ioc;
+using Utils.Json;
 
 namespace service.domain.Services
 {
     [Register(ServiceType = typeof(IImageDataService))]
-    public class ImageDataService([FromKeyedServices(repository.doraemon.Constants.ImageDataRepositoryIocKey)] IImageDataRepository imageDataRepository) : IImageDataService
+    public class ImageDataService(
+        [FromKeyedServices(repository.doraemon.Constants.ImageDataRepositoryIocKey)] IImageDataRepository imageDataRepository,
+        [FromKeyedServices(DomainConstants.Ioc_RabbitMq_DoraemonData_TopicMode)] MqProducerTopicMode rabbitMqProducer
+        ) : IImageDataService
     {
         private readonly IImageDataRepository _imageDataRepository = imageDataRepository;
+        private readonly MqProducerTopicMode _rabbitMqProducer = rabbitMqProducer;
         public async Task<IReadOnlyList<DoraemonItem>?> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             return await _imageDataRepository.GetByUserIdAsync(userId, cancellationToken);
@@ -19,6 +26,17 @@ namespace service.domain.Services
         {
             var newItem = doraemonItemCreateDto.ToDto();
             newItem = await _imageDataRepository.AddAsync(newItem, cancellationToken);
+
+            try
+            {
+                await PublishMqAsync(newItem);
+            }
+            catch (Exception ex)
+            {
+                Log4Logger.Logger.Error($"Failed to publish message to MQ for item {newItem.Id}", ex);
+                throw;
+            }
+
             await _imageDataRepository.SaveChangeAsync(cancellationToken);
 
             return newItem;
@@ -28,6 +46,17 @@ namespace service.domain.Services
         {
             await _imageDataRepository.UpdateAsync(item);
             await _imageDataRepository.SaveChangeAsync(cancellationToken);
+        }
+
+        public async Task PublishMqAsync(DoraemonItem item, CancellationToken cancellationToken = default)
+        {
+            var doraemonMqData = new DoraemonMqData
+            (
+                Topic : DomainConstants.RabbitMq_Topic_DoraemonData,
+                DoraemonItem : item,
+                Source : DomainConstants.RabbitMq_Source_DomainService
+            );
+            await _rabbitMqProducer.ProduceAsync(doraemonMqData, cancellationToken);
         }
     }
 }

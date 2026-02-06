@@ -1,4 +1,5 @@
-﻿using Messaging.RabbitMq.Connections;
+﻿using Messaging.RabbitMq;
+using Messaging.RabbitMq.Connections;
 using NetUtils.Aspnet.Configurations;
 using repository.doraemon.Repositories;
 
@@ -28,8 +29,7 @@ namespace service.domain.Configurations.Services
 
             private void Configurations()
             {
-                // build your customized configs under appsettings.json
-                //builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection(Constants.FileStorageSettings));
+                builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection(DomainConstants.RabbitMqSettings));
             }
         }
     }
