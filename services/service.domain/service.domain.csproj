@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\CSharp\Laboratory\Messaging\Messaging.csproj" />
     <ProjectReference Include="..\..\..\..\..\CSharp\Laboratory\NetUtils\NetUtils.csproj" />
     <ProjectReference Include="..\repository.doraemon\repository.doraemon.csproj" />
   </ItemGroup>

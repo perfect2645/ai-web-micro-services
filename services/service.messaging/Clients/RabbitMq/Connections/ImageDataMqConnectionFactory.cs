@@ -1,10 +1,9 @@
 ﻿using Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
+using service.messaging.Configurations;
 using Utils.Ioc;
 using Utils.Tasking;
-using WebapiMq;
-using WebapiMq.Configurations;
 
 namespace service.messaging.Clients.RabbitMq.Connections
 {

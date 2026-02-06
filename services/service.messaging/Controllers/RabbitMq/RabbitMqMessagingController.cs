@@ -1,7 +1,8 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using service.messaging.Model;
+using service.messaging.Services;
 using WebapiMq.Model;
-using WebapiMq.Services;
 
 namespace WebapiMq.Controllers.RabbitMq
 {
@@ -24,6 +25,14 @@ namespace WebapiMq.Controllers.RabbitMq
         public async Task<IActionResult> SendMessage([FromBody] DoraemonMessage message)
         {
             await _messageService.SendImageMessageAsync(message.ImagePath, message.Message);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("DoraemonTopicMessage")]
+        public async Task<IActionResult> SendTopicMessage([FromBody] DoraemonTopicMessage message)
+        {
+            await _messageService.SendTopicMessageAsync(message.Topic, message.ImagePath, message.Message);
             return Ok();
         }
     }

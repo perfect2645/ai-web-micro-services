@@ -1,4 +1,5 @@
-﻿using NetUtils.Aspnet.Configurations;
+﻿using Messaging.RabbitMq.Connections;
+using NetUtils.Aspnet.Configurations;
 using repository.doraemon.Repositories;
 
 namespace service.domain.Configurations.Services
@@ -12,7 +13,8 @@ namespace service.domain.Configurations.Services
                 builder.RegisterAssembliesAutofac(
                 [
                     typeof(Program).Assembly,
-                    typeof(IFileRepository).Assembly // your repository assemblies
+                    typeof(IFileRepository).Assembly,
+                    typeof(IRabbitMqConnectionFactory).Assembly
                 ]);
                 builder.RegisterMiddlewares();
                 builder.Configurations();
