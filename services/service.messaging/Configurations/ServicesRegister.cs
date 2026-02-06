@@ -1,5 +1,6 @@
 ﻿using NetUtils.Aspnet.Configurations;
-using RabbitMQ.Client;
+using service.messaging;
+using service.messaging.Configurations;
 
 namespace WebapiMq.Configurations
 {
