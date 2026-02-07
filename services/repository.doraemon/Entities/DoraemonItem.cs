@@ -27,5 +27,5 @@ namespace repository.doraemon.Entities
         public string? ErrorMessage { get; set; } = string.Empty;
         public Guid? OutputImageId { get;set; }
         public string? OutputImageUrl { get;set; }
-}
+    }
 }

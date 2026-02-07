@@ -22,7 +22,7 @@ var app = builder.Build();
 app.ConfigApp();
 
 // Mapping SignalR Hub endpoint (React client connection address: /realTimeHub)
-app.MapHub<SignalRHub>("/SignalRHub");
+app.MapHub<SignalRHub>("/signalRHub");
 
 
 app.Run();
