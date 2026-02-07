@@ -28,7 +28,7 @@ export function useSignalR(
         transport: signalR.HttpTransportType.WebSockets,
         withCredentials: true,
       })
-      .withAutomaticReconnect([0, 2000, 5000, 10000])
+      .withAutomaticReconnect([0, 5000, 20000, 30000])
       .build();
 
     // 连接状态监听

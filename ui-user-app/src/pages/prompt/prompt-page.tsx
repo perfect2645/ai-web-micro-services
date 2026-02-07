@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import PromptInput, { PromptImage } from "@/components/prompt/prompt-input";
-import { FileResponse } from "@/types";
+import { FileResponse } from "@/types/FileResponse";
 import { v4 as uuidv4 } from "uuid";
+import PromptResult from "@/pages/prompt/prompt-result";
 
 const blessingList = [
   "新年快乐！",
@@ -103,21 +104,26 @@ const PromptPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2 style={{ color: "#1f2937", marginBottom: 20, textAlign: "center" }}>
-        Prompt with text and image
-      </h2>
-      <PromptInput
-        onChange={handlePromptChange}
-        onSubmit={handlePromptSubmit}
-        placeholder="Please enter your question, or upload an image for assistance..."
-      />
-      {isSubmitting && (
-        <div style={{ textAlign: "center", marginTop: 10, color: "#6b7280" }}>
-          正在上传图片...
-        </div>
-      )}
-    </div>
+    <>
+      <div>
+        <PromptResult></PromptResult>
+      </div>
+      <div style={{ padding: 20 }}>
+        <h2 style={{ color: "#1f2937", marginBottom: 20, textAlign: "center" }}>
+          Prompt with text and image
+        </h2>
+        <PromptInput
+          onChange={handlePromptChange}
+          onSubmit={handlePromptSubmit}
+          placeholder="Please enter your question, or upload an image for assistance..."
+        />
+        {isSubmitting && (
+          <div style={{ textAlign: "center", marginTop: 10, color: "#6b7280" }}>
+            正在上传图片...
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
