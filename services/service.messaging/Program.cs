@@ -1,6 +1,7 @@
 using Logging;
 using NetUtils.Aspnet.Configurations;
 using NetUtils.Aspnet.Configurations.Swagger;
+using service.messaging.Hubs;
 using WebapiMq.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,5 +20,9 @@ builder.AddSwaggerGenExt($"{typeof(Program).Assembly.GetName().Name}.xml");
 var app = builder.Build();
 
 app.ConfigApp();
+
+// Mapping SignalR Hub endpoint (React client connection address: /realTimeHub)
+app.MapHub<SignalRHub>("/SignalRHub");
+
 
 app.Run();

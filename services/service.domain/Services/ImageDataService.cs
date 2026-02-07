@@ -3,8 +3,8 @@ using repository.doraemon.Entities;
 using repository.doraemon.Repositories.Domain;
 using service.domain.Models;
 using service.messaging.Clients.Producer;
+using service.shared.Models;
 using Utils.Ioc;
-using Utils.Json;
 
 namespace service.domain.Services
 {
@@ -50,7 +50,7 @@ namespace service.domain.Services
 
         public async Task PublishMqAsync(DoraemonItem item, CancellationToken cancellationToken = default)
         {
-            var doraemonMqData = new DoraemonMqData
+            var doraemonMqData = new DoraemonMessage
             (
                 Topic : DomainConstants.RabbitMq_Topic_DoraemonData,
                 DoraemonItem : item,

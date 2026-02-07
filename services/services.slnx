@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/api.services/">
     <Project Path="repository.doraemon/repository.doraemon.csproj" Id="761eff37-3781-4d26-a303-cd7d29d8f022" />
+    <Project Path="service.shared/service.shared.csproj" Id="22bbaf1b-5871-404f-bb4d-67602d9dd9ff" />
   </Folder>
   <Folder Name="/api.services/domain-service/">
     <Project Path="service.domain/service.domain.csproj" Id="dc7ef269-fb35-403e-ac3e-3c1fb9ec7199" />

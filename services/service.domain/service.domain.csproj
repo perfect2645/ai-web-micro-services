@@ -32,6 +32,7 @@
     <ProjectReference Include="..\..\..\..\..\CSharp\Laboratory\Messaging\Messaging.csproj" />
     <ProjectReference Include="..\..\..\..\..\CSharp\Laboratory\NetUtils\NetUtils.csproj" />
     <ProjectReference Include="..\repository.doraemon\repository.doraemon.csproj" />
+    <ProjectReference Include="..\service.shared\service.shared.csproj" />
   </ItemGroup>
 
 </Project>
