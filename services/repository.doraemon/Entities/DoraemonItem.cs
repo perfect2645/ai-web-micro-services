@@ -4,17 +4,17 @@ using System.ComponentModel.DataAnnotations;
 namespace repository.doraemon.Entities
 {
     public record DoraemonItem(
-        [property: Required]
-        [property: MaxLength(64)]
+        [Required]
+        [MaxLength(64)]
         string UserId,
 
-        [property: Required]
+        [Required]
         Guid InputImageId,
 
-        [property:Required]
+        [Required]
         string InputImageUrl,
 
-        [property: MaxLength(512)] 
+        [MaxLength(512)] 
         string? PromptText
     ) : IEntity, IEntityTiming
     {
