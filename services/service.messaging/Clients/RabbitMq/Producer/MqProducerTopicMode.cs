@@ -3,7 +3,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using service.messaging.Clients.RabbitMq.Connections;
 using service.messaging.Clients.RabbitMq.Producer;
-using service.messaging.Model;
+using service.shared.Models;
 using System.Text;
 using System.Text.Json;
 using Utils.Ioc;
@@ -11,8 +11,8 @@ using Utils.Tasking;
 
 namespace service.messaging.Clients.Producer
 {
-    [Register(ServiceType = typeof(IRabbitMqProducer<DoraemonTopicMessage>), Key = MessagingConstants.Ioc_RabbitMq_TopicMode, Lifetime = Lifetime.Singleton)]
-    public class MqProducerTopicMode : IRabbitMqProducer<DoraemonTopicMessage>
+    [Register(ServiceType = typeof(IRabbitMqProducer<DoraemonMessage>), Key = MessagingConstants.Ioc_RabbitMq_TopicMode, Lifetime = Lifetime.Singleton)]
+    public class MqProducerTopicMode : IRabbitMqProducer<DoraemonMessage>
     {
 
         private readonly IDoraemonMqConnectionFactory _connectionFactory;
@@ -49,7 +49,7 @@ namespace service.messaging.Clients.Producer
 
         #endregion Init
 
-        public async Task ProduceAsync(DoraemonTopicMessage messagePayload, CancellationToken ct = default)
+        public async Task ProduceAsync(DoraemonMessage messagePayload, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(messagePayload);
 

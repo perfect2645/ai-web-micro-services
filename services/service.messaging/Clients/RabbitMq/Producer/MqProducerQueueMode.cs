@@ -2,13 +2,12 @@
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using service.messaging.Clients.RabbitMq.Connections;
+using service.shared.Models;
 using System.Text;
 using System.Text.Json;
 using Utils.Ioc;
 using Utils.Tasking;
-using WebapiMq;
 using WebapiMq.Configurations;
-using WebapiMq.Model;
 
 namespace service.messaging.Clients.RabbitMq.Producer
 {
