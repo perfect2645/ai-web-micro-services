@@ -49,5 +49,21 @@ namespace service.messaging.Hubs
 
             await base.OnDisconnectedAsync(exception);
         }
+
+        public async Task JoinGroup(string groupName)
+        {
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(groupName);
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName.Trim());
+            Log4Logger.Logger.Info($"SignalR: Client [{Context.ConnectionId}] joined group : {groupName}");
+        }
+
+        public async Task LeaveGroup(string groupName)
+        {
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(groupName);
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName.Trim());
+            Log4Logger.Logger.Info($"SignalR: Client[{Context.ConnectionId}] leaved group : {groupName}");
+        }
     }
 }

@@ -4,22 +4,20 @@ import {
   DoraemonMessage,
   ImageRecognitionStatus,
 } from "@/types/doraemonMessage";
-
+import { useCallback } from "react";
 import classes from "./prompt-result.module.scss";
 const PromptResult = () => {
   const [messages, setMessages] = useState<DoraemonMessage[]>([]);
 
-  // 强类型回调，TS会自动校验msg的结构
-  const handleMessageReceived = (msg: DoraemonMessage) => {
+  const handleMessageReceived = useCallback((msg: DoraemonMessage) => {
     setMessages((prev) => [msg, ...prev]);
 
-    // 示例：根据状态做业务逻辑
     if (msg.doraemonItem.status === ImageRecognitionStatus.Failed) {
       alert(
-        `用户${msg.doraemonItem.userId}的图片识别失败：${msg.doraemonItem.errorMessage}`,
+        `用户${msg.doraemonItem.userId}识别失败：${msg.doraemonItem.errorMessage}`,
       );
     }
-  };
+  }, []);
 
   const { connectionState } = useSignalR(handleMessageReceived);
 
