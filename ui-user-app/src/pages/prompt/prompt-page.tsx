@@ -72,6 +72,14 @@ const PromptPage: React.FC = () => {
     console.log("当前图片：", imageData.remoteUrl);
   };
 
+  const getOrCreateUserId = (): string => {
+    let userId = localStorage.getItem("doraemonUserId");
+    if (!userId) {
+      userId = uuidv4();
+      localStorage.setItem("doraemonUserId", userId);
+    }
+    return userId;
+  };
   // 处理提交
   const handlePromptSubmit = async (text: string, image: PromptImage) => {
     if (isSubmitting) return; // 防止重复提交
@@ -79,7 +87,7 @@ const PromptPage: React.FC = () => {
     setIsSubmitting(true);
 
     const formData = new FormData();
-    const tempUserId = uuidv4();
+    const tempUserId = getOrCreateUserId();
     formData.append("userId", tempUserId);
     formData.append("inputImageId", imgData ? imgData.id : "");
     formData.append("inputImageUrl", imgData ? imgData.remoteUrl : "");
