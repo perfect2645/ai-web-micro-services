@@ -8,7 +8,6 @@ namespace service.messaging.Hubs
 {
     public class SignalRHub(IOptions<SignalRSettings> signalRSettings) : Hub
     {
-
         private readonly SignalRSettings _signalRSettings = signalRSettings.Value;
 
         /// <summary>
@@ -30,18 +29,41 @@ namespace service.messaging.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            if (exception != null)
+            try
             {
-                Log4Logger.Logger.Error($"Client [{connectionId}] disconnected from SignalR", exception);
-            }
-            else
-            {
-                Log4Logger.Logger.Info($"Client [{connectionId}] disconnected from SignalR");
-            }
+                await Groups.RemoveFromGroupAsync(connectionId, _signalRSettings.Group);
 
-            await Groups.RemoveFromGroupAsync(connectionId, _signalRSettings.Group);
+                if (exception != null)
+                {
+                    Log4Logger.Logger.Error($"Client [{connectionId}] disconnected from SignalR unexpectly", exception);
+                }
+                else
+                {
+                    Log4Logger.Logger.Info($"Client [{connectionId}] manually disconnected from SignalR");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log4Logger.Logger.Error($"SignalR connection error: {ex.Message}", ex);
+            }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task JoinGroup(string groupName)
+        {
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(groupName);
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName.Trim());
+            Log4Logger.Logger.Info($"SignalR: Client [{Context.ConnectionId}] joined group : {groupName}");
+        }
+
+        public async Task LeaveGroup(string groupName)
+        {
+            ArgumentNullException.ThrowIfNullOrWhiteSpace(groupName);
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName.Trim());
+            Log4Logger.Logger.Info($"SignalR: Client[{Context.ConnectionId}] leaved group : {groupName}");
         }
     }
 }
