@@ -10,6 +10,8 @@ const PromptResult = () => {
   const [messages, setMessages] = useState<DoraemonMessage[]>([]);
 
   const handleMessageReceived = useCallback((msg: DoraemonMessage) => {
+    console.log("Received message:", msg);
+
     setMessages((prev) => [msg, ...prev]);
 
     if (msg.doraemonItem.status === ImageRecognitionStatus.Failed) {
@@ -29,7 +31,9 @@ const PromptResult = () => {
           <div key={msg.doraemonItem.id} style={{ margin: "10px 0" }}>
             <p>主题：{msg.topic}</p>
             <p>用户ID：{msg.doraemonItem.userId}</p>
-            <p>图片URL：{msg.doraemonItem.inputImageUrl}</p>
+            <article className={classes.imageContainer}>
+              <img src={msg.doraemonItem.outputImageUrl} alt="Output Image" />
+            </article>
             <p>状态：{msg.doraemonItem.status}</p>
             <p>
               创建时间：{new Date(msg.doraemonItem.createTime).toLocaleString()}
