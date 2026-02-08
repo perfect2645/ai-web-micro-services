@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import torch
 import requests
+import hashlib  # 移到顶部，避免函数内局部导入（可选，更规范）
 from albumentations.pytorch import ToTensorV2
 import albumentations as A
 from io import BytesIO
@@ -91,7 +92,6 @@ def process_stroke_image(image_url):
             img_arr = np.asarray(Image.open(BytesIO(resp.content)).convert('RGB'))
             img_bgr = cv2.cvtColor(img_arr, cv2.COLOR_RGB2BGR)
             # 临时文件名（用时间戳/哈希避免重名）
-            import hashlib
             file_hash = hashlib.md5(image_url.encode()).hexdigest()
             stem = file_hash
         else:
@@ -142,17 +142,18 @@ def post_outputs(url, overlay_path, prob_path, payload=None, timeout=15):
                 'overlay': (os.path.basename(overlay_path), f1, 'image/png'),
                 'prob': (os.path.basename(prob_path), f2, 'image/png'),
             }
-            resp = requests.post(url, data=payload or {}, files=files, timeout=timeout)
+            resp = requests.post(url, data=payload or {}, files=files, timeout=timeout, verify=False)  # 加verify=False适配自签名证书
         ok = 200 <= resp.status_code < 300
         print(f"POST {url} -> {resp.status_code}")
         return ok
     except Exception as e:
         print(f"POST请求失败: {e}")
         return False
-
-# 测试入口（单独运行此文件时测试）
+    
+""" 
+    # 测试入口（单独运行此文件时测试）
 if __name__ == '__main__':
     # 测试用URL/本地路径
     test_img = "https://xxx.png"  # 替换为你的测试图
     success, overlay, prob = process_stroke_image(test_img)
-    print(success, overlay, prob)
+    print(success, overlay, prob) """

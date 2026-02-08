@@ -152,7 +152,7 @@ def callback(ch, method, properties, body):
             # 无论是否重试，都要nack原消息（requeue=False，避免重复）
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         
-        # （可选）将更新后的doraemonItem发送到回调队列，通知WebAPI处理结果
+        # 修改doraemon_item属性，并调用https通知WebAPI处理结果
         # send_callback_to_webapi(doraemon_item)
 
     except Exception as e:
