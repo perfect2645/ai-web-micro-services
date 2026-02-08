@@ -4,6 +4,7 @@ using NetUtils.Aspnet.Configurations.Swagger;
 using NetUtils.Aspnet.Filters;
 using NetUtils.Repository.Configurations;
 using repository.doraemon.Repositories;
+using service.file.Configurations;
 using service.file.Configurations.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,6 @@ builder.AddSwaggerGenExt($"{typeof(Program).Assembly.GetName().Name}.xml", swagg
 
 var app = builder.Build();
 
-app.ConfigApp();
+app.ConfigApplication();
 
 app.Run();
