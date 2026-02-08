@@ -4,8 +4,6 @@ using repository.doraemon.Entities;
 using repository.doraemon.Repositories.Entities;
 using service.domain.Models;
 using service.domain.Services;
-using service.shared.Models;
-using System.ComponentModel.DataAnnotations;
 using Utils.Json;
 
 namespace service.domain.Controllers
@@ -34,7 +32,7 @@ namespace service.domain.Controllers
         }
 
         [HttpPost("RabbitMq")]
-        public async Task<ActionResult> SendMqMessage([FromForm] DoraemonItem doraemonItem)
+        public async Task<ActionResult> SendMqMessage([FromBody] DoraemonItem doraemonItem)
         {
             try
             {

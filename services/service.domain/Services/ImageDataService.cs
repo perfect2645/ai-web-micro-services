@@ -11,11 +11,11 @@ namespace service.domain.Services
     [Register(ServiceType = typeof(IImageDataService))]
     public class ImageDataService(
         [FromKeyedServices(repository.doraemon.Constants.ImageDataRepositoryIocKey)] IImageDataRepository imageDataRepository,
-        [FromKeyedServices(DomainConstants.Ioc_RabbitMq_DoraemonData_TopicMode)] MqProducerTopicMode rabbitMqProducer
+        [FromKeyedServices(DomainConstants.Ioc_RabbitMq_DoraemonData_TopicMode)] MqProducerTopicMode<DoraemonMessage> rabbitMqProducer
         ) : IImageDataService
     {
         private readonly IImageDataRepository _imageDataRepository = imageDataRepository;
-        private readonly MqProducerTopicMode _rabbitMqProducer = rabbitMqProducer;
+        private readonly MqProducerTopicMode<DoraemonMessage> _rabbitMqProducer = rabbitMqProducer;
         public async Task<IReadOnlyList<DoraemonItem>?> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             return await _imageDataRepository.GetByUserIdAsync(userId, cancellationToken);

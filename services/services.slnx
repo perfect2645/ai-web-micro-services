@@ -21,4 +21,7 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
+  <Folder Name="/testing/">
+    <Project Path="../testing/RabbitMqClient/RabbitMqClient.csproj" Id="77901553-d1fb-4aaa-b596-5c379d39f97e" />
+  </Folder>
 </Solution>
