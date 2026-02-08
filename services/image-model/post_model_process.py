@@ -2,7 +2,15 @@
 import cv2
 import numpy as np
 import requests
+import json
 from io import BytesIO
+from datetime import datetime
+
+# ====================== 新增：服务接口配置 ======================
+# DomainService更新doraemon对象的API
+DOMAIN_SERVICE_UPDATE_URL = "https://localhost:7093/api/doraemon"
+# MessagingService通知前端的SignalR API
+MESSAGING_SERVICE_NOTIFY_URL = "https://localhost:7094/api/signalrmessaging/send"
 
 # FileService配置
 FILE_SERVICE_API = "https://localhost:7092/api/file"
@@ -60,9 +68,87 @@ def post_process(overlay_rgb, prob_array, file_stem):
         if not prob_file_obj.get("remoteUrl") or not prob_file_obj.get("id"):
             raise Exception("FileService返回的概率图对象缺少核心字段（remoteUrl/id）")
 
-        # 关键修改：返回完整文件对象
+        # 返回完整文件对象
         return True, overlay_file_obj, prob_file_obj
 
     except Exception as e:
         print(f"调用FileService上传图片失败: {str(e)}")
         return False, {}, {}  # 失败时返回空字典，避免后续取值报错
+
+# ====================== 新增：DomainService更新接口 ======================
+def call_domain_service_update(updated_doraemon_item):
+    """
+    调用DomainService的Update API更新doraemon对象
+    :param updated_doraemon_item: 已更新的doraemonItem字典
+    :return: success(bool), response_data(dict)
+    """
+    try:
+        print(f"📤 调用DomainService更新doraemon对象：ID={updated_doraemon_item.get('id')}")
+        resp = requests.post(
+            url=DOMAIN_SERVICE_UPDATE_URL,
+            json=updated_doraemon_item,
+            verify=False,  # 适配自签名证书
+            timeout=30
+        )
+        resp.raise_for_status()  # 非200响应抛出异常
+        response_data = resp.json() if resp.content else {}
+        print(f"✅ DomainService更新成功：{response_data}")
+        return True, response_data
+    except Exception as e:
+        error_msg = f"DomainService更新失败：{str(e)}"
+        print(f"❌ {error_msg}")
+        return False, {"error": error_msg}
+
+# ====================== 新增：MessagingService通知接口 ======================
+def call_messaging_service_notify(doraemon_message):
+    """
+    调用MessagingService的SignalR API通知前端
+    :param doraemon_message: 符合格式的doraemonMessage字典
+    :return: success(bool), response_data(dict)
+    """
+    try:
+        print(f"📤 调用MessagingService通知前端：任务ID={doraemon_message.get('doraemonItem', {}).get('id')}")
+        resp = requests.post(
+            url=MESSAGING_SERVICE_NOTIFY_URL,
+            json=doraemon_message,
+            verify=False,  # 适配自签名证书
+            timeout=30
+        )
+        resp.raise_for_status()
+        response_data = resp.json() if resp.content else {}
+        print(f"✅ MessagingService通知成功：{response_data}")
+        return True, response_data
+    except Exception as e:
+        error_msg = f"MessagingService通知失败：{str(e)}"
+        print(f"❌ {error_msg}")
+        return False, {"error": error_msg}
+
+# ====================== 新增：统一回调函数（封装两个接口调用） ======================
+def send_doraemon_callback(original_payload, updated_doraemon_item):
+    """
+    统一回调入口：先更新DomainService，再通知前端
+    :param original_payload: 原始消息payload（用于提取topic/source）
+    :param updated_doraemon_item: 更新后的doraemonItem
+    :return: 无（仅打印日志，不阻断主流程）
+    """
+    try:
+        # 1. 调用DomainService更新doraemon对象
+        domain_success, _ = call_domain_service_update(updated_doraemon_item)
+        
+        # 2. 构造doraemonMessage（匹配前端通知格式）
+        doraemon_message = {
+            "topic": original_payload.get("topic", "image.process.complete"),  # 沿用原消息topic或默认
+            "doraemonItem": updated_doraemon_item,
+            "source": original_payload.get("source", "python.image.process")  # 沿用原消息source或默认
+        }
+        
+        # 3. 调用MessagingService通知前端
+        messaging_success, _ = call_messaging_service_notify(doraemon_message)
+        
+        # 4. 打印整体回调结果
+        if domain_success and messaging_success:
+            print(f"✅ 回调完成：DomainService更新成功 + MessagingService通知成功")
+        else:
+            print(f"⚠️  回调部分失败：DomainService={domain_success}, MessagingService={messaging_success}")
+    except Exception as e:
+        print(f"❌ 统一回调执行异常：{str(e)}")

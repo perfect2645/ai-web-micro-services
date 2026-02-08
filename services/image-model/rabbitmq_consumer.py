@@ -6,8 +6,9 @@ from datetime import datetime
 import requests
 from io import BytesIO
 
-# ====================== 新增：导入脑卒中图像处理函数 ======================
+# ====================== 新增：导入回调函数 ======================
 from stroke_segmentation_U_net_load_model_Post import process_stroke_image, post_outputs
+from post_model_process import send_doraemon_callback  # 导入统一回调函数
 
 # ====================== 全局禁用SSL警告 ======================
 from urllib3.exceptions import InsecureRequestWarning
@@ -24,14 +25,6 @@ RABBITMQ_SETTINGS = {
     "RoutingKey": "doraemon.topic",
     "QueueName": "image_process_topic_queue"
 }
-
-# ====================== 移除无用配置（不再本地保存图片） ======================
-# 注释/删除本地目录相关配置（已无意义）
-# TEMP_IMAGE_DIR = "./temp_images"
-# STROKE_RESULT_DIR = "./results"
-# os.makedirs(TEMP_IMAGE_DIR, exist_ok=True)
-# os.makedirs(STROKE_RESULT_DIR, exist_ok=True)
-# OUTPUT_IMAGE_BASE_URL = "http://192.168.60.128:8080/images/"
 
 def process_image(task_id, input_image_url, prompt_text):
     """
@@ -75,10 +68,11 @@ def process_image(task_id, input_image_url, prompt_text):
         return False, "", "", error_msg
 
 def callback(ch, method, properties, body):
-    """Topic消息回调函数：适配使用返回的图片ID，无其他逻辑变更"""
+    """Topic消息回调函数：新增调用统一回调函数"""
     try:
-        # 1. 解析消息payload
+        # 1. 解析消息payload（保留原始payload用于回调）
         payload = json.loads(body.decode('utf-8'))
+        original_payload = payload  # 保存原始payload，用于构造回调消息
         print(f"\n📥 收到Topic消息（路由键：{method.routing_key}）：")
         print(f"   消息主题：{payload.get('topic')}")
         print(f"   消息来源：{payload.get('source')}")
@@ -114,14 +108,18 @@ def callback(ch, method, properties, body):
         )
         
         # 5. 更新doraemonItem（使用返回的图片ID，无需手动生成）
-        doraemon_item["updateTime"] = datetime.utcnow().isoformat() + "Z"
+        updated_doraemon_item = doraemon_item.copy()  # 复制原对象，避免修改原始数据
+        updated_doraemon_item["updateTime"] = datetime.utcnow().isoformat() + "Z"
         if success:
-            doraemon_item["status"] = "Success"
-            doraemon_item["outputImageId"] = output_image_id  # 用FileService返回的ID
-            doraemon_item["outputImageUrl"] = output_image_url  # 用FileService返回的URL
-            doraemon_item["errorMessage"] = ""
+            updated_doraemon_item["status"] = "Success"
+            updated_doraemon_item["outputImageId"] = output_image_id  # 用FileService返回的ID
+            updated_doraemon_item["outputImageUrl"] = output_image_url  # 用FileService返回的URL
+            updated_doraemon_item["errorMessage"] = ""
             ch.basic_ack(delivery_tag=method.delivery_tag)
             print(f"✅ 任务{task_id}处理完成，已确认消息")
+            
+            # ========== 新增：调用统一回调函数 ==========
+            send_doraemon_callback(original_payload, updated_doraemon_item)
         else:
             # 重试逻辑（保持原有）
             retry_count = int(properties.headers.get('x-retry-count', 0))
@@ -139,11 +137,12 @@ def callback(ch, method, properties, body):
                 print(f"❌ 任务{task_id}处理失败，重试次数{retry_count+1}/{max_retry}，消息重新入队")
             else:
                 print(f"❌ 任务{task_id}处理失败，已超过最大重试次数{max_retry}，消息丢弃")
+                # 失败时也更新状态并回调（可选）
+                updated_doraemon_item["status"] = "Failed"
+                updated_doraemon_item["errorMessage"] = error_msg
+                send_doraemon_callback(original_payload, updated_doraemon_item)
             
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
-        
-        # （可选）调用WebAPI通知结果（如需启用，取消注释并实现）
-        # send_callback_to_webapi(doraemon_item)
 
     except Exception as e:
         error_msg = f"解析/处理消息失败：{str(e)}"
@@ -205,21 +204,6 @@ def start_topic_consumer():
     except Exception as e:
         print(f"❌ 消费者启动失败：{str(e)}")
         start_topic_consumer()
-
-# （可选）回调WebAPI函数（如需启用，补充URL即可）
-def send_callback_to_webapi(updated_doraemon_item):
-    callback_url = "http://192.168.60.128:5000/api/image/callback"  # 替换为实际回调地址
-    try:
-        resp = requests.post(
-            callback_url,
-            json=updated_doraemon_item,
-            timeout=10,
-            verify=False  # 适配自签名证书
-        )
-        resp.raise_for_status()
-        print(f"✅ 回调WebAPI成功：{callback_url}，响应码={resp.status_code}")
-    except Exception as e:
-        print(f"❌ 回调WebAPI失败：{str(e)}")
 
 if __name__ == "__main__":
     # 安装依赖：pip install pika pillow requests opencv-python<4.10 segmentation-models-pytorch torch albumentations
