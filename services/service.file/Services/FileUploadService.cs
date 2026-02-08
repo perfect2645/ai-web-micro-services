@@ -1,5 +1,6 @@
 ﻿
 using Logging;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Options;
 using NetUtils.Aspnet.Generic;
 using NetUtils.Repository;
@@ -18,14 +19,17 @@ namespace service.file.Services
         private readonly IRepository<UploadedItem, Guid> _repository;
         private readonly FileStorageSettings _fileStorageSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly StaticFileOptions _staticFileOptions;
 
         public FileUploadService([FromKeyedServices(repository.doraemon.Constants.FileRepositoryIocKey)]IRepository<UploadedItem, Guid> repository, 
             IOptions<FileStorageSettings> fileStorageSettings,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            StaticFileOptions staticFileOptions)
         {
             _repository = repository;
             _fileStorageSettings = fileStorageSettings.Value;
             _httpContextAccessor = httpContextAccessor;
+            _staticFileOptions = staticFileOptions;
         }
 
         public async Task<UploadedItem?> GetUploadedItemAsync(long fileSize, string sha256Hash, CancellationToken cancellationToken = default)
@@ -42,7 +46,7 @@ namespace service.file.Services
 
         public async Task<UploadedItem> UploadFileAsync(Stream fileDataStream, string fileName, string? description = null, CancellationToken cancellationToken = default)
         {
-            // save file to disk D:\Web\image-ai\fileServiceStorage
+            // save file to disk
             var fileHashInCache = _httpContextAccessor.GetString(Constants.Context_FileHash);
             var fileHash = fileHashInCache ?? HashHelper.ComputeSHA256Hash(fileDataStream);
             long fileSize = fileDataStream.Length;
@@ -52,8 +56,8 @@ namespace service.file.Services
             _ = _httpContextAccessor.TryGetValue(Constants.Context_ExistingFile, out UploadedItem? existingFile);
             if (existingFile != null)
             {
-                backupPath = existingFile.BackupUrl;
-                remotePath = existingFile.RemoteUrl;
+                backupPath = ConvertStaticUrlToLocalPath(existingFile.BackupUrl);
+                remotePath = ConvertStaticUrlToLocalPath(existingFile.RemoteUrl);
             }
             else
             {
@@ -133,6 +137,16 @@ namespace service.file.Services
             var urlRelativePath = relativePath.Replace('\\', '/');
 
             filePath = $"{_fileStorageSettings.ApiBaseUrl}{_fileStorageSettings.RequestPath}/{urlRelativePath}";
+        }
+
+        private string ConvertStaticUrlToLocalPath(string fileUrl)
+        {
+            var urlMappingPrefix = $"{_fileStorageSettings.ApiBaseUrl.TrimEnd('/')}{_staticFileOptions.RequestPath}";
+            var relativePath = Path.GetRelativePath(urlMappingPrefix, fileUrl);
+
+            var filePath = Path.Combine(_fileStorageSettings.LocalRootPath, relativePath);
+
+            return filePath;
         }
     }
 }
