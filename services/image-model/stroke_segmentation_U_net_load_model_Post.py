@@ -12,31 +12,28 @@ import albumentations as A
 from io import BytesIO
 from PIL import Image
 
+# ===================== 新增：导入FileService上传函数 =====================
+from post_model_process import post_process
+
 # ===================== 全局配置（只加载1次模型）=====================
 print("Setting up inference environment...")
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 IMG_H, IMG_W = 256, 256
 
-# 结果保存目录
-base_dir = os.getcwd()
-results_dir = os.path.join(base_dir, 'results')
-os.makedirs(results_dir, exist_ok=True)
-print(f"Results will be saved to: {results_dir}")
-
 # 模型加载（全局只执行一次，避免重复加载）
 def find_model_weights():
     candidates = [
         'best_stroke_model_with_normals.pth',
-        os.path.join(base_dir, 'best_stroke_model_with_normals.pth'),
-        os.path.join(base_dir, 'working', 'best_stroke_model_with_normals.pth'),
+        os.path.join(os.getcwd(), 'best_stroke_model_with_normals.pth'),
+        os.path.join(os.getcwd(), 'working', 'best_stroke_model_with_normals.pth'),
     ]
     for c in candidates:
         if os.path.isfile(c):
             return c
     search_roots = [
-        base_dir,
-        os.path.dirname(base_dir),
-        os.path.join(base_dir, 'Stroke_segmentation_UNet'),
+        os.getcwd(),
+        os.path.dirname(os.getcwd()),
+        os.path.join(os.getcwd(), 'Stroke_segmentation_UNet'),
     ]
     for root in search_roots:
         for p in glob.glob(os.path.join(root, '**', 'best_stroke_model_with_normals.pth'), recursive=True):
@@ -80,7 +77,7 @@ def process_stroke_image(image_url):
     """
     脑卒中图像分割处理函数
     :param image_url: 网络图片URL / 本地图片路径
-    :return: success(bool), overlay_path(str), prob_path(str)
+    :return: success(bool), overlay_file_obj(dict), prob_file_obj(dict)
     """
     try:
         # 1. 下载网络图片 / 读取本地图片
@@ -99,7 +96,7 @@ def process_stroke_image(image_url):
             img_bgr = cv2.imread(image_url)
             if img_bgr is None:
                 print(f"ERROR: 无法读取本地图片 {image_url}")
-                return False, "", ""
+                return False, {}, {}
             stem = os.path.splitext(os.path.basename(image_url))[0]
 
         # 2. 图像预处理
@@ -117,20 +114,24 @@ def process_stroke_image(image_url):
         overlay = rgb_r.copy()
         overlay[pred_bin > 0] = (255, 64, 64)
 
-        # 5. 保存输出图片
-        out_overlay = os.path.join(results_dir, f"{stem}_overlay.png")
-        out_prob = os.path.join(results_dir, f"{stem}_prob.png")
+        # 5. 调用FileService上传图片（替代本地保存）
+        # 关键修改：接收完整文件对象
+        success_upload, overlay_file_obj, prob_file_obj = post_process(overlay, prob, stem)
+        if not success_upload:
+            print(f"FileService上传失败，任务终止")
+            return False, {}, {}
 
-        cv2.imwrite(out_overlay, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
-        prob_u8 = (np.clip(prob, 0, 1) * 255).astype(np.uint8)
-        cv2.imwrite(out_prob, prob_u8)
-
-        print(f"处理完成！保存叠加图: {out_overlay}\n保存概率图: {out_prob}")
-        return True, out_overlay, out_prob
+        # 打印关键信息（便于调试，可根据需求调整）
+        print(f"处理完成！")
+        print(f"叠加图对象：id={overlay_file_obj.get('id')}, remoteUrl={overlay_file_obj.get('remoteUrl')}")
+        print(f"概率图对象：id={prob_file_obj.get('id')}, remoteUrl={prob_file_obj.get('remoteUrl')}")
+        
+        # 关键修改：返回完整文件对象
+        return True, overlay_file_obj, prob_file_obj
 
     except Exception as e:
         print(f"图像处理失败: {str(e)}")
-        return False, "", ""
+        return False, {}, {}
 
 # ===================== 原上传函数（保留，可调用）=====================
 def post_outputs(url, overlay_path, prob_path, payload=None, timeout=15):
@@ -149,11 +150,3 @@ def post_outputs(url, overlay_path, prob_path, payload=None, timeout=15):
     except Exception as e:
         print(f"POST请求失败: {e}")
         return False
-    
-""" 
-    # 测试入口（单独运行此文件时测试）
-if __name__ == '__main__':
-    # 测试用URL/本地路径
-    test_img = "https://xxx.png"  # 替换为你的测试图
-    success, overlay, prob = process_stroke_image(test_img)
-    print(success, overlay, prob) """
