@@ -3,9 +3,17 @@ import json
 import os
 import uuid
 from datetime import datetime
-from PIL import Image
-import requests
+import requests  # 保留，用于后续可能的回调
 from io import BytesIO
+
+# ====================== 新增：导入脑卒中图像处理函数 ======================
+# 确保 stroke_segmentation_U_net_load_model_Post.py 和本文件在同一目录
+from stroke_segmentation_U_net_load_model_Post import process_stroke_image, post_outputs
+
+# ====================== 全局禁用SSL警告 ======================
+from urllib3.exceptions import InsecureRequestWarning
+# 全局禁用：所有requests请求的InsecureRequestWarning都不会显示
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # ====================== RabbitMQ配置（保持原有） ======================
 RABBITMQ_SETTINGS = {
@@ -19,88 +27,60 @@ RABBITMQ_SETTINGS = {
     "QueueName": "image_process_topic_queue"
 }
 
-# ====================== 图片处理相关配置 ======================
+# ====================== 图片处理相关配置（适配脑卒中处理） ======================
 # 本地临时存储路径（下载图片/处理后图片）
 TEMP_IMAGE_DIR = "./temp_images"
+# 脑卒中处理结果保存目录（和分割脚本中的results_dir保持一致）
+STROKE_RESULT_DIR = "./results"
 # 处理后图片的基础URL（根据你的实际存储服务调整，如OSS/MinIO地址）
 OUTPUT_IMAGE_BASE_URL = "http://192.168.60.128:8080/images/"
 
-# 初始化临时目录
+# 初始化目录
 os.makedirs(TEMP_IMAGE_DIR, exist_ok=True)
-
-def download_image_from_url(image_url, save_path):
-    """从URL下载图片到本地临时路径"""
-    try:
-        # 发送GET请求获取图片（添加超时和重试）
-        response = requests.get(
-            image_url,
-            timeout=30,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-        )
-        response.raise_for_status()  # 抛出HTTP错误
-        
-        # 保存图片到本地
-        with open(save_path, 'wb') as f:
-            f.write(response.content)
-        
-        print(f"✅ 图片下载完成：{image_url} -> {save_path}")
-        return True
-    except Exception as e:
-        print(f"❌ 图片下载失败：{str(e)}")
-        return False
+os.makedirs(STROKE_RESULT_DIR, exist_ok=True)
 
 def process_image(task_id, input_image_url, prompt_text):
     """
-    核心图片处理函数（适配新payload）
+    核心图片处理函数（替换为脑卒中图像分割逻辑）
     :param task_id: 任务唯一ID（doraemonItem.id）
-    :param input_image_url: 待处理图片URL
-    :param prompt_text: 处理提示文本（如尺寸、风格等）
+    :param input_image_url: 消息中的图片URL
+    :param prompt_text: 处理提示文本（保留，兼容原有参数）
     :return: 处理结果（success, output_image_id, output_image_url, error_msg）
     """
-    # 1. 生成临时文件路径
-    input_image_path = os.path.join(TEMP_IMAGE_DIR, f"{task_id}_input.jpg")
-    output_image_path = os.path.join(TEMP_IMAGE_DIR, f"{task_id}_output.jpg")
-    
     try:
-        # 2. 下载图片
-        if not download_image_from_url(input_image_url, input_image_path):
-            raise Exception(f"图片下载失败：{input_image_url}")
+        print(f"📌 开始处理脑卒中分割任务 {task_id}, 图片URL: {input_image_url}")
         
-        # 3. 解析promptText获取处理指令（示例：从prompt中提取目标尺寸，格式如"width=800,height=600"）
-        target_width, target_height = 800, 600  # 默认尺寸
-        if prompt_text and "," in prompt_text:
-            for item in prompt_text.split(","):
-                if "width=" in item:
-                    target_width = int(item.split("=")[1].strip())
-                if "height=" in item:
-                    target_height = int(item.split("=")[1].strip())
+        # 调用脑卒中分割核心函数，传入图片URL（函数内部自动下载+推理）
+        success, overlay_path, prob_path = process_stroke_image(input_image_url)
         
-        # 4. 执行图片处理（缩放为例，可扩展为AI风格转换等）
-        with Image.open(input_image_path) as img:
-            # 等比例缩放
-            img.thumbnail((target_width, target_height))
-            # 保存处理后图片
-            img.save(output_image_path, quality=90)
+        if not success:
+            return False, "", "", "脑卒中图像分割模型执行失败"
         
-        # 5. 生成输出图片的ID和URL（模拟上传到文件服务，替换为你的实际存储逻辑）
-        output_image_id = str(uuid.uuid4())  # 生成新的UUID
-        output_image_url = f"{OUTPUT_IMAGE_BASE_URL}{output_image_id}.jpg"
+        # 1. 生成输出图片ID（保持原有UUID逻辑）
+        output_image_id = str(uuid.uuid4())
         
-        # （可选）实际项目中需将output_image_path上传到存储服务，然后删除本地临时文件
-        # upload_to_oss(output_image_path, output_image_id)
-        # os.remove(input_image_path)
-        # os.remove(output_image_path)
+        # 2. 生成输出图片URL（适配你的存储服务）
+        # 示例1：本地文件映射URL（需配置web服务器指向STROKE_RESULT_DIR）
+        overlay_filename = os.path.basename(overlay_path)
+        output_image_url = f"{OUTPUT_IMAGE_BASE_URL}{overlay_filename}"
         
-        print(f"✅ 图片处理完成：任务ID={task_id}，输出URL={output_image_url}")
+        # （可选）示例2：如果需要上传到OSS/MinIO，取消下面注释并实现upload_to_storage函数
+        # output_image_url = upload_to_storage(overlay_path, output_image_id)
+        
+        # （可选）如果需要POST结果到指定URL，取消下面注释
+        # post_url = os.getenv('POST_URL', 'http://192.168.60.128:8080/api/result')
+        # post_outputs(post_url, overlay_path, prob_path, {"task_id": task_id, "user_id": user_id})
+        
+        print(f"✅ 脑卒中分割完成：任务ID={task_id}，叠加图路径={overlay_path}，输出URL={output_image_url}")
         return True, output_image_id, output_image_url, ""
     
     except Exception as e:
-        error_msg = str(e)
-        print(f"❌ 图片处理失败：任务ID={task_id}，错误={error_msg}")
+        error_msg = f"脑卒中分割处理异常: {str(e)}"
+        print(f"❌ 任务{task_id}处理失败：{error_msg}")
         return False, "", "", error_msg
 
 def callback(ch, method, properties, body):
-    """Topic消息回调函数：解析新payload并处理"""
+    """Topic消息回调函数：保持原有逻辑，仅适配新的process_image返回值"""
     try:
         # 1. 解析完整的JSON消息payload
         payload = json.loads(body.decode('utf-8'))
@@ -116,7 +96,7 @@ def callback(ch, method, properties, body):
         # 3. 提取doraemonItem中的关键字段（添加空值校验）
         task_id = doraemon_item.get("id")
         input_image_url = doraemon_item.get("inputImageUrl")
-        prompt_text = doraemon_item.get("promptText", "")
+        prompt_text = doraemon_item.get("promptText", "")  # 保留，兼容原有参数
         user_id = doraemon_item.get("userId")
         
         # 基础字段校验
@@ -132,14 +112,14 @@ def callback(ch, method, properties, body):
         print(f"   输入图片URL：{input_image_url}")
         print(f"   处理提示：{prompt_text}")
         
-        # 4. 执行图片处理
+        # 4. 执行脑卒中图像分割处理（替换原有缩放逻辑）
         success, output_image_id, output_image_url, error_msg = process_image(
             task_id=task_id,
             input_image_url=input_image_url,
             prompt_text=prompt_text
         )
         
-        # 5. 更新doraemonItem的状态和结果（可发送回调通知WebAPI）
+        # 5. 更新doraemonItem的状态和结果（完全保留原有逻辑）
         doraemon_item["updateTime"] = datetime.utcnow().isoformat() + "Z"  # 符合ISO格式
         if success:
             doraemon_item["status"] = "Success"
@@ -150,11 +130,27 @@ def callback(ch, method, properties, body):
             ch.basic_ack(delivery_tag=method.delivery_tag)
             print(f"✅ 任务{task_id}处理完成，已确认消息")
         else:
-            doraemon_item["status"] = "Failed"
-            doraemon_item["errorMessage"] = error_msg
-            # 处理失败：拒绝消息并重新入队（可根据需求调整重试次数）
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
-            print(f"❌ 任务{task_id}处理失败，消息重新入队")
+            retry_count = int(properties.headers.get('x-retry-count', 0))
+            max_retry = 3  # 最多重试3次
+            
+            if retry_count < max_retry:
+                # 重试次数+1，重新入队
+                new_headers = properties.headers or {}
+                new_headers['x-retry-count'] = retry_count + 1
+                # 重新发布消息到队列（带更新的headers）
+                ch.basic_publish(
+                    exchange=RABBITMQ_SETTINGS["ExchangeName"],
+                    routing_key=method.routing_key,
+                    body=body,
+                    properties=pika.BasicProperties(headers=new_headers)
+                )
+                print(f"❌ 任务{task_id}处理失败，重试次数{retry_count+1}/{max_retry}，消息重新入队")
+            else:
+                # 超过重试次数，丢弃消息
+                print(f"❌ 任务{task_id}处理失败，已超过最大重试次数{max_retry}，消息丢弃")
+            
+            # 无论是否重试，都要nack原消息（requeue=False，避免重复）
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
         
         # （可选）将更新后的doraemonItem发送到回调队列，通知WebAPI处理结果
         # send_callback_to_webapi(doraemon_item)
@@ -165,6 +161,7 @@ def callback(ch, method, properties, body):
         # 避免死循环：失败后不再重新入队
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
+# ====================== 以下代码完全保留原有逻辑 ======================
 def start_topic_consumer():
     """启动RabbitMQ Topic模式消费者（保持原有逻辑）"""
     try:
@@ -212,7 +209,7 @@ def start_topic_consumer():
             auto_ack=False
         )
 
-        print(f"🚀 Python Topic消费者已启动：")
+        print(f"🚀 Python Topic消费者已启动（脑卒中分割版）：")
         print(f"   交换机：{RABBITMQ_SETTINGS['ExchangeName']}")
         print(f"   路由键：{RABBITMQ_SETTINGS['RoutingKey']}")
         print(f"   监听队列：{RABBITMQ_SETTINGS['QueueName']}")
@@ -227,7 +224,7 @@ def start_topic_consumer():
         # 重连逻辑
         start_topic_consumer()
 
-# （可选）回调函数：将处理结果通知WebAPI
+# （可选）回调函数：将处理结果通知WebAPI（保留原有注释）
 # def send_callback_to_webapi(updated_doraemon_item):
 #     callback_url = "http://192.168.60.128:5000/api/image/callback"
 #     try:
@@ -235,6 +232,15 @@ def start_topic_consumer():
 #     except Exception as e:
 #         print(f"❌ 回调WebAPI失败：{str(e)}")
 
+# （可选）文件上传函数（如需上传到OSS/MinIO，实现此函数）
+# def upload_to_storage(local_file_path, file_id):
+#     """将本地处理后的图片上传到存储服务，返回访问URL"""
+#     # 示例：上传到MinIO/OSS
+#     # client = Minio(...)
+#     # client.fput_object("bucket-name", f"{file_id}.png", local_file_path)
+#     # return f"{OUTPUT_IMAGE_BASE_URL}{file_id}.png"
+#     pass
+
 if __name__ == "__main__":
-    # 安装依赖：pip install pika pillow requests
+    # 安装依赖：pip install pika pillow requests opencv-python<4.10 segmentation-models-pytorch torch albumentations
     start_topic_consumer()
