@@ -63,10 +63,12 @@ namespace service.file.Services
             }
 
             var backupUrl = await SaveFileToStorageAsync(fileDataStream, backupPath, cancellationToken);
+            ConvertLocalPathToStaticUrl(ref backupUrl);
 
             fileDataStream.Position = 0;
 
             var remoteUrl = await SaveFileToStorageAsync(fileDataStream, remotePath, cancellationToken);
+            ConvertLocalPathToStaticUrl(ref remoteUrl);
             var uploadedItem = new UploadedItem(fileName, fileSize, fileHash, backupUrl, remoteUrl, description);
 
             await SaveFileItemToDbAsync(uploadedItem, cancellationToken);
@@ -81,6 +83,7 @@ namespace service.file.Services
                 Log4Logger.Logger.Info($"Target file (SHA256: {uploadedItem.FileHash}) already exists in the system.");
                 return;
             }
+
             await _repository.AddAsync(uploadedItem, cancellationToken);
             await _repository.SaveChangeAsync();
             Log4Logger.Logger.Info($"File metadata saved to database. FileId: {uploadedItem.Id}");
@@ -121,6 +124,15 @@ namespace service.file.Services
                 Log4Logger.Logger.Error($"Upload file failed. [{filePath}]", ex);
                 throw;
             }
+        }
+
+        private void ConvertLocalPathToStaticUrl(ref string filePath)
+        {
+            var relativePath = Path.GetRelativePath(_fileStorageSettings.LocalRootPath, filePath);
+
+            var urlRelativePath = relativePath.Replace('\\', '/');
+
+            filePath = $"{_fileStorageSettings.ApiBaseUrl}{_fileStorageSettings.RequestPath}/{urlRelativePath}";
         }
     }
 }
