@@ -3,10 +3,8 @@
 
 #！pip install "opencv-python<4.10"
 # Override test image paths to use a specific image
-TEST_IMAGE_PATHS = [r"D:\Brain_stroke_image\Brain_Stroke_CT_Dataset\External_Test\PNG\10007.png"]
+TEST_IMAGE_PATHS = [r"D:\Web\image-ai\temp_images\10007.png"]
 print("Using TEST_IMAGE_PATHS override:", TEST_IMAGE_PATHS)
-
-
 
 # ==== Load trained model and predict brain images (save overlays) ====
 import os, glob, cv2, numpy as np, torch
