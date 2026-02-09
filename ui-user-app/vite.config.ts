@@ -35,13 +35,6 @@ export default defineConfig({
         ws: true, // 如果有WebSocket可保留
         rewrite: (path) => path, // 无需重写路径，直接转发
       },
-      "/SignalRHub": {
-        target: "https://127.0.0.1:7094",
-        changeOrigin: true,
-        secure: false, // 忽略自签名证书
-        ws: true, // 关键！开启WebSocket代理，适配SignalR底层通信
-        rewrite: (path) => path,
-      },
     },
   },
 });
