@@ -93,6 +93,7 @@ const PromptPage: React.FC = () => {
 
     const formData = new FormData();
     const tempUserId = getOrCreateUserId();
+    console.log("imagedata to submit:", imgData);
     formData.append("userId", tempUserId);
     formData.append("inputImageId", imgData ? imgData.id : "");
     formData.append("inputImageUrl", imgData ? imgData.remoteUrl : "");

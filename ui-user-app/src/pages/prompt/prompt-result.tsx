@@ -26,9 +26,9 @@ const PromptResult = () => {
   return (
     <div className={classes.container}>
       <h3 className={classes.signalRState}>SignalR state: {connectionState}</h3>
-      <h3 className={classes.signalRState}>
+      {/* <h3 className={classes.signalRState}>
         <a href="https://home.fawei.dpdns.org/rabbitmq">RabbitMQ Status</a>
-      </h3>
+      </h3> */}
       <div>
         {messages.map((msg) => (
           <div key={msg.doraemonItem.id} className={classes.messageItem}>
