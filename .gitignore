@@ -420,3 +420,7 @@ FodyWeavers.xsd
 # nginx cert folder
 
 ssl/
+
+# keep nginx temp folder but ignore its content
+!gateway-nginx/nginx-1.29.4/temp/
+gateway-nginx/nginx-1.29.4/temp/**
