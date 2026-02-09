@@ -84,7 +84,7 @@ def call_domain_service_update(updated_doraemon_item):
     """
     try:
         print(f"📤 调用DomainService更新doraemon对象：ID={updated_doraemon_item.get('id')}")
-        resp = requests.post(
+        resp = requests.put(
             url=DOMAIN_SERVICE_UPDATE_URL,
             json=updated_doraemon_item,
             verify=False,  # 适配自签名证书
@@ -137,9 +137,9 @@ def send_doraemon_callback(original_payload, updated_doraemon_item):
         
         # 2. 构造doraemonMessage（匹配前端通知格式）
         doraemon_message = {
-            "topic": original_payload.get("topic", "image.process.complete"),  # 沿用原消息topic或默认
+            "topic": original_payload.get("topic", "doraemon.topic"),  # 沿用原消息topic或默认
             "doraemonItem": updated_doraemon_item,
-            "source": original_payload.get("source", "python.image.process")  # 沿用原消息source或默认
+            "source": "python.image.process" # 沿用原消息source或默认
         }
         
         # 3. 调用MessagingService通知前端

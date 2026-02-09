@@ -31,6 +31,22 @@ namespace service.domain.Controllers
             return Ok(result);
         }
 
+
+        [HttpPut]
+        public async Task<ActionResult> Update([FromBody] DoraemonItem updateDto)
+        {
+            try
+            {
+                await _imageDataService.UpdateAsync(updateDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to update DoraemonItem with Id: {Id}", updateDto.Id);
+                return StatusCode(500, "Failed to update the item.");
+            }
+            return Ok();
+        }
+
         [HttpPost("RabbitMq")]
         public async Task<ActionResult> SendMqMessage([FromBody] DoraemonItem doraemonItem)
         {
