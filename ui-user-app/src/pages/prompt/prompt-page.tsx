@@ -44,7 +44,7 @@ const PromptPage: React.FC = () => {
 
     try {
       //Patrick notes: 设置跨域的话，这里只需要把url的path => /api/file
-      const response = await fetch("/api/file", {
+      const response = await fetch("https://127.0.0.1:7092/api/file", {
         method: "POST",
         body: formData,
       });
@@ -94,7 +94,7 @@ const PromptPage: React.FC = () => {
     formData.append("propmtText", text);
 
     try {
-      await fetch("/api/doraemon", {
+      await fetch("https://127.0.0.1:7093/api/doraemon", {
         method: "POST",
         body: formData,
       });
