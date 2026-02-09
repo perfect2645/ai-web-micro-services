@@ -16,7 +16,7 @@ export interface PromptInputProps {
   // 内容变更回调（返回文字和图片列表）
   onChange: (text: string, image: PromptImage) => void;
   // 提交回调（点击提交/回车提交时触发）
-  onSubmit: (text: string, image: PromptImage) => void;
+  onSubmit: (text: string) => void;
   // 占位提示文字
   placeholder?: string;
   // 自定义类名
@@ -219,7 +219,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
   const handleSubmitClick = useCallback(() => {
     if (disabled) return;
     if (img) {
-      onSubmit(text, img);
+      onSubmit(text);
     } else {
       alert("Please prompt image for submission.");
     }

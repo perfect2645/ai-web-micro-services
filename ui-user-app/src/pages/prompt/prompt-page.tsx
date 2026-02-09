@@ -81,7 +81,7 @@ const PromptPage: React.FC = () => {
     return userId;
   };
   // 处理提交
-  const handlePromptSubmit = async (text: string, image: PromptImage) => {
+  const handlePromptSubmit = async (text: string) => {
     if (isSubmitting) return; // 防止重复提交
 
     setIsSubmitting(true);
