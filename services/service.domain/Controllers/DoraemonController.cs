@@ -4,7 +4,6 @@ using repository.doraemon.Entities;
 using repository.doraemon.Repositories.Entities;
 using service.domain.Models;
 using service.domain.Services;
-using System.ComponentModel.DataAnnotations;
 using Utils.Json;
 
 namespace service.domain.Controllers
@@ -30,6 +29,37 @@ namespace service.domain.Controllers
         {
             var result = await _imageDataService.AddAsync(createDto);
             return Ok(result);
+        }
+
+
+        [HttpPut]
+        public async Task<ActionResult> Update([FromBody] DoraemonItem updateDto)
+        {
+            try
+            {
+                await _imageDataService.UpdateAsync(updateDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to update DoraemonItem with Id: {Id}", updateDto.Id);
+                return StatusCode(500, "Failed to update the item.");
+            }
+            return Ok();
+        }
+
+        [HttpPost("RabbitMq")]
+        public async Task<ActionResult> SendMqMessage([FromBody] DoraemonItem doraemonItem)
+        {
+            try
+            {
+                await _imageDataService.PublishMqAsync(doraemonItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to publish message to MQ for DoraemonItem with Id: {Id}", doraemonItem.Id);
+                return StatusCode(500, "Failed to publish message to MQ.");
+            }
+            return Ok();
         }
     }
 }
