@@ -111,7 +111,7 @@ def callback(ch, method, properties, body):
         updated_doraemon_item = doraemon_item.copy()  # 复制原对象，避免修改原始数据
         updated_doraemon_item["updateTime"] = datetime.utcnow().isoformat() + "Z"
         if success:
-            updated_doraemon_item["status"] = "Success"
+            updated_doraemon_item["status"] = 3 # Succeeded
             updated_doraemon_item["outputImageId"] = output_image_id  # 用FileService返回的ID
             updated_doraemon_item["outputImageUrl"] = output_image_url  # 用FileService返回的URL
             updated_doraemon_item["errorMessage"] = ""

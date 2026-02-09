@@ -78,48 +78,75 @@ def post_process(overlay_rgb, prob_array, file_stem):
 # ====================== 新增：DomainService更新接口 ======================
 def call_domain_service_update(updated_doraemon_item):
     """
-    调用DomainService的Update API更新doraemon对象
+    调用DomainService的Update API更新doraemon对象（修复400排查+调试器异常）
     :param updated_doraemon_item: 已更新的doraemonItem字典
     :return: success(bool), response_data(dict)
     """
+    response_data = {}
     try:
         print(f"📤 调用DomainService更新doraemon对象：ID={updated_doraemon_item.get('id')}")
+        # 打印最终发送的请求体（关键！对比Swagger）
+        print(f"请求体：\n{json.dumps(updated_doraemon_item, ensure_ascii=False, indent=2)}")
+        
         resp = requests.put(
             url=DOMAIN_SERVICE_UPDATE_URL,
             json=updated_doraemon_item,
             verify=False,  # 适配自签名证书
             timeout=30
         )
-        resp.raise_for_status()  # 非200响应抛出异常
-        response_data = resp.json() if resp.content else {}
+        
+        # 先记录响应状态和内容，再判断是否抛异常（避免调试器拦截）
+        status_code = resp.status_code
+        response_text = resp.text.strip() if resp.text else "无响应内容"
+        
+        if status_code >= 400:
+            raise Exception(f"HTTP {status_code}: {response_text}")
+        
+        # 兼容204无响应体
+        if status_code == 204:
+            response_data = {"status": "success", "message": "更新成功（无响应体）"}
+        else:
+            response_data = resp.json() if response_text else {}
+        
         print(f"✅ DomainService更新成功：{response_data}")
         return True, response_data
+    
     except Exception as e:
+        # 修复：直接捕获通用异常，避免调试器解析HTTPError的特殊属性
         error_msg = f"DomainService更新失败：{str(e)}"
         print(f"❌ {error_msg}")
+        # 打印完整的请求体和响应，定位400原因
+        print(f"❌ 触发400的请求体：\n{json.dumps(updated_doraemon_item, ensure_ascii=False, indent=2)}")
         return False, {"error": error_msg}
-
 # ====================== 新增：MessagingService通知接口 ======================
 def call_messaging_service_notify(doraemon_message):
-    """
-    调用MessagingService的SignalR API通知前端
-    :param doraemon_message: 符合格式的doraemonMessage字典
-    :return: success(bool), response_data(dict)
-    """
     try:
-        print(f"📤 调用MessagingService通知前端：任务ID={doraemon_message.get('doraemonItem', {}).get('id')}")
+        print(f"📤 调用MessagingService的请求体：\n{json.dumps(doraemon_message, ensure_ascii=False, indent=2)}")
         resp = requests.post(
             url=MESSAGING_SERVICE_NOTIFY_URL,
             json=doraemon_message,
-            verify=False,  # 适配自签名证书
+            verify=False,
             timeout=30
         )
         resp.raise_for_status()
-        response_data = resp.json() if resp.content else {}
+        
+        # 兼容空响应体
+        if resp.status_code == 204:
+            response_data = {"status": "success", "message": "通知成功（无响应体）"}
+        else:
+            response_data = resp.json() if resp.content.strip() else {}
+        
         print(f"✅ MessagingService通知成功：{response_data}")
         return True, response_data
+    
+    except requests.exceptions.HTTPError as e:
+        error_content = resp.text if resp.content else "无返回内容"
+        error_msg = f"MessagingService通知失败（状态码{resp.status_code}）：{str(e)}，返回内容：{error_content}"
+        print(f"❌ {error_msg}")
+        return False, {"error": error_msg}
+    
     except Exception as e:
-        error_msg = f"MessagingService通知失败：{str(e)}"
+        error_msg = f"MessagingService通知异常：{str(e)}"
         print(f"❌ {error_msg}")
         return False, {"error": error_msg}
 
