@@ -26,17 +26,25 @@ const PromptResult = () => {
   return (
     <div className={classes.container}>
       <h3 className={classes.signalRState}>SignalR state: {connectionState}</h3>
+      <h3 className={classes.signalRState}>
+        <a href="https://home.fawei.dpdns.org/rabbitmq">RabbitMQ Status</a>
+      </h3>
       <div>
         {messages.map((msg) => (
-          <div key={msg.doraemonItem.id} style={{ margin: "10px 0" }}>
-            <p>主题：{msg.topic}</p>
-            <p>用户ID：{msg.doraemonItem.userId}</p>
-            <article className={classes.imageContainer}>
+          <div key={msg.doraemonItem.id} className={classes.messageItem}>
+            <article className={classes.imgContainer}>
               <img src={msg.doraemonItem.outputImageUrl} alt="Output Image" />
             </article>
-            <p>状态：{msg.doraemonItem.status}</p>
+            <p>topic：{msg.topic}</p>
+            <p>userId：{msg.doraemonItem.userId}</p>
+            <p>process status：{msg.doraemonItem.status}</p>
             <p>
-              创建时间：{new Date(msg.doraemonItem.createTime).toLocaleString()}
+              createTime：
+              {new Date(msg.doraemonItem.createTime).toLocaleString()}
+            </p>
+            <p>
+              outputImageUrl ：
+              <a href={msg.doraemonItem.outputImageUrl}>Click to download</a>
             </p>
           </div>
         ))}

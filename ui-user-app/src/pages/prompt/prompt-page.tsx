@@ -4,6 +4,12 @@ import { FileResponse } from "@/types/FileResponse";
 import { v4 as uuidv4 } from "uuid";
 import PromptResult from "@/pages/prompt/prompt-result";
 
+const VITE_FILE_UPLOAD_URL =
+  import.meta.env.VITE_FILE_UPLOAD_URL || "https://localhost:7092/api/file";
+const VITE_DORAEMON_API_URL =
+  import.meta.env.VITE_DORAEMON_API_URL ||
+  "https://localhost:7093/api/doraemon";
+
 const blessingList = [
   "新年快乐！",
   "马年吉祥！",
@@ -43,8 +49,7 @@ const PromptPage: React.FC = () => {
     formData.append("description", description);
 
     try {
-      //Patrick notes: 设置跨域的话，这里只需要把url的path => /api/file
-      const response = await fetch("https://127.0.0.1:7092/api/file", {
+      const response = await fetch(VITE_FILE_UPLOAD_URL, {
         method: "POST",
         body: formData,
       });
@@ -94,7 +99,7 @@ const PromptPage: React.FC = () => {
     formData.append("propmtText", text);
 
     try {
-      await fetch("https://127.0.0.1:7093/api/doraemon", {
+      await fetch(VITE_DORAEMON_API_URL, {
         method: "POST",
         body: formData,
       });
@@ -127,7 +132,7 @@ const PromptPage: React.FC = () => {
         />
         {isSubmitting && (
           <div style={{ textAlign: "center", marginTop: 10, color: "#6b7280" }}>
-            正在上传图片...
+            Uploading image...
           </div>
         )}
       </div>

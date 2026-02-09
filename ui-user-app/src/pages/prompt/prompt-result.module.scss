@@ -1,5 +1,5 @@
 .container {
-  min-height: 700px;
+  min-height: 500px;
   padding: 20px;
 }
 
@@ -8,5 +8,14 @@
 }
 
 .imgContainer {
+  display: flex;
+  justify-content: center;
+
   width: 100%;
+}
+
+.messageItem {
+  margin: 10px 0;
+
+  color: rgba($color: skyblue, $alpha: 0.8);
 }
